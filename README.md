@@ -2,13 +2,13 @@
   <img src="static/mw-mark.svg" width="84" alt="MORPH WRLD logo">
 </p>
 
-<h1 align="center">MORPH WRLD — CV Studio</h1>
+<h1 align="center">MORPH WRLD — Curriculum Vitae</h1>
 
 <p align="center">
-  Local-first CV analysis with transparent ATS scoring, job matching, and practical improvement suggestions.
+  Local-first CV analysis and creation with transparent ATS scoring, editable DOCX export, and practical improvement suggestions.
 </p>
 
-CV Studio extracts text from PDF and DOCX documents, scores common ATS signals, compares the CV with an optional role description, and turns the result into a prioritized action plan. No external AI service or account is required.
+MORPH WRLD Curriculum Vitae extracts text from PDF and DOCX documents, scores common ATS signals, compares the CV with an optional role description, and turns the result into a prioritized action plan. Its CV Builder also creates an editable DOCX from structured career information. No external AI service or account is required.
 
 > Scores are heuristic guidance. They do not reproduce a specific employer's applicant-tracking system and are not hiring decisions.
 
@@ -22,6 +22,10 @@ CV Studio extracts text from PDF and DOCX documents, scores common ATS signals, 
 
 ![MORPH WRLD CV Studio results dashboard](docs/screenshots/cv-studio-results.png)
 
+### CV Builder
+
+![MORPH WRLD Curriculum Vitae builder](docs/screenshots/cv-studio-builder.jpg)
+
 ## Highlights
 
 - Clear ATS score with a visible category breakdown
@@ -31,6 +35,11 @@ CV Studio extracts text from PDF and DOCX documents, scores common ATS signals, 
 - Local processing with automatic temporary-file cleanup
 - No external API or cloud upload
 - Native Windows window powered by pywebview
+- Built-in CV creator with repeatable experience and education sections
+- Three editable DOCX styles: Europass-inspired, ATS Classic, and Modern Minimal
+- Dedicated fields for language, digital, project, certification, and volunteering information
+
+The Europass-inspired option follows the familiar information structure described by [Europass](https://europass.europa.eu/en/create-europass-cv), but it is an independent template and is not an official EU/Europass document.
 
 ## Run from source
 
@@ -51,7 +60,7 @@ The desktop window starts an internal Flask server bound only to a random loopba
 .\build.ps1
 ```
 
-The executable is written to `dist\MORPH-WRLD-CV-Studio.exe`.
+The executable is written to `dist\MW-Curriculum-Vitae.exe`.
 
 ## Tests
 

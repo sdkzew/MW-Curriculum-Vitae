@@ -9,10 +9,10 @@ if (-not (Test-Path ".venv\Scripts\python.exe")) {
     --clean `
     --onefile `
     --windowed `
-    --name "MORPH-WRLD-CV-Studio" `
+    --name "MW-Curriculum-Vitae" `
     --add-data "templates;templates" `
     --add-data "static;static" `
     --collect-all webview `
     app.py
 
-Write-Host "Build complete: dist\MORPH-WRLD-CV-Studio.exe"
+Write-Host "Build complete: dist\MW-Curriculum-Vitae.exe"

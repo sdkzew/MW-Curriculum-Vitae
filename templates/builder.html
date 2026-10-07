@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#08080c">
+    <title>Creează CV — MORPH WRLD</title>
+    <link rel="icon" href="{{ url_for('static', filename='mw-mark.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="builder-page">
+    <div class="app-shell">
+        <aside class="step-rail" aria-label="Pași creare CV">
+            <a href="/" class="rail-logo" aria-label="MORPH WRLD Curriculum Vitae">
+                <img src="{{ url_for('static', filename='mw-mark.svg') }}" alt="MORPH WRLD">
+            </a>
+            <div class="rail-line" aria-hidden="true"></div>
+            <ol class="steps">
+                <li class="step active"><span class="step-dot"><span></span></span><span class="step-number">01</span><span class="step-name">PROFIL</span></li>
+                <li class="step"><span class="step-dot"></span><span class="step-number">02</span><span class="step-name">CARIERĂ</span></li>
+                <li class="step"><span class="step-dot"></span><span class="step-number">03</span><span class="step-name">EXPORT</span></li>
+            </ol>
+            <span class="rail-version">v1.2</span>
+        </aside>
+
+        <main class="workspace builder-workspace">
+            <header class="topbar">
+                <div class="brand-lockup"><strong>MORPH WRLD</strong><span></span><small>CURRICULUM VITAE</small></div>
+                <nav class="mode-switch" aria-label="Mod aplicație">
+                    <a href="/">ANALIZEAZĂ</a>
+                    <a href="/builder" class="active" aria-current="page">CREEAZĂ CV</a>
+                </nav>
+                <div class="privacy-strip"><span class="local-pill"><i></i>Procesare locală</span></div>
+            </header>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}<div class="alert" role="alert">{% for msg in messages %}<p>{{ msg }}</p>{% endfor %}</div>{% endif %}
+            {% endwith %}
+
+            <form action="/builder/export" method="POST" class="builder-layout" id="cv-builder">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <section class="builder-form">
+                    <div class="page-intro builder-intro">
+                        <span class="eyebrow">CV BUILDER · EXPORT DOCX</span>
+                        <h1>Construiește un CV care te reprezintă.</h1>
+                        <p>Completezi datele local, alegi stilul, apoi descarci documentul editabil.</p>
+                    </div>
+
+                    <section class="form-card">
+                        <div class="form-card-heading"><span>01</span><div><h2>Identitate profesională</h2><p>Informațiile esențiale din antetul CV-ului.</p></div></div>
+                        <div class="form-grid">
+                            <label class="field field-wide"><span>Nume complet *</span><input id="full_name" name="full_name" maxlength="120" placeholder="Alex Morgan" required></label>
+                            <label class="field field-wide"><span>Titlu profesional</span><input id="headline" name="headline" maxlength="180" placeholder="Product Designer · UI Systems"></label>
+                            <label class="field"><span>Email</span><input id="email" name="email" type="email" maxlength="254" placeholder="alex@email.com"></label>
+                            <label class="field"><span>Telefon</span><input name="phone" maxlength="80" placeholder="+40 7xx xxx xxx"></label>
+                            <label class="field"><span>Locație</span><input id="location" name="location" maxlength="160" placeholder="București, România"></label>
+                            <label class="field"><span>LinkedIn</span><input name="linkedin" maxlength="300" placeholder="linkedin.com/in/alex"></label>
+                            <label class="field field-wide"><span>Website / Portofoliu</span><input name="website" maxlength="300" placeholder="alexmorgan.design"></label>
+                            <label class="field field-wide"><span>Profil profesional</span><textarea id="summary" name="summary" maxlength="4000" rows="4" placeholder="Rezumat scurt, clar și orientat spre impact..."></textarea></label>
+                        </div>
+                    </section>
+
+                    <section class="form-card">
+                        <div class="form-card-heading"><span>02</span><div><h2>Experiență profesională</h2><p>Poți adăuga până la 8 roluri. Scrie realizările pe rânduri separate.</p></div></div>
+                        <div class="repeatable-list" id="experience-list">
+                            <article class="repeatable-item">
+                                <div class="repeatable-head"><strong>EXPERIENȚĂ 01</strong><button type="button" class="remove-row" aria-label="Șterge experiența">ȘTERGE</button></div>
+                                <div class="form-grid">
+                                    <label class="field"><span>Rol</span><input name="experience_role" maxlength="180" placeholder="Senior Product Designer"></label>
+                                    <label class="field"><span>Organizație</span><input name="experience_organization" maxlength="180" placeholder="Company Studio"></label>
+                                    <label class="field"><span>Perioadă</span><input name="experience_dates" maxlength="100" placeholder="2023 — Prezent"></label>
+                                    <label class="field"><span>Locație</span><input name="experience_location" maxlength="120" placeholder="Remote"></label>
+                                    <label class="field field-wide"><span>Realizări / responsabilități</span><textarea name="experience_details" maxlength="4000" rows="4" placeholder="Am crescut conversia cu 18%...&#10;Am coordonat un sistem de design..."></textarea></label>
+                                </div>
+                            </article>
+                        </div>
+                        <button type="button" class="add-row" id="add-experience">＋ ADAUGĂ EXPERIENȚĂ</button>
+                    </section>
+
+                    <section class="form-card">
+                        <div class="form-card-heading"><span>03</span><div><h2>Educație și formare</h2><p>Studii, cursuri relevante și calificări profesionale.</p></div></div>
+                        <div class="repeatable-list" id="education-list">
+                            <article class="repeatable-item">
+                                <div class="repeatable-head"><strong>EDUCAȚIE 01</strong><button type="button" class="remove-row" aria-label="Șterge educația">ȘTERGE</button></div>
+                                <div class="form-grid">
+                                    <label class="field"><span>Calificare</span><input name="education_qualification" maxlength="180" placeholder="Licență · Design"></label>
+                                    <label class="field"><span>Instituție</span><input name="education_institution" maxlength="180" placeholder="Universitatea..."></label>
+                                    <label class="field"><span>Perioadă</span><input name="education_dates" maxlength="100" placeholder="2019 — 2022"></label>
+                                    <label class="field"><span>Locație</span><input name="education_location" maxlength="120" placeholder="București"></label>
+                                    <label class="field field-wide"><span>Detalii</span><textarea name="education_details" maxlength="3000" rows="3" placeholder="Specializare, rezultate, activități relevante..."></textarea></label>
+                                </div>
+                            </article>
+                        </div>
+                        <button type="button" class="add-row" id="add-education">＋ ADAUGĂ EDUCAȚIE</button>
+                    </section>
+
+                    <section class="form-card">
+                        <div class="form-card-heading"><span>04</span><div><h2>Competențe și secțiuni extra</h2><p>Structură compatibilă cu informațiile recomandate de Europass.</p></div></div>
+                        <div class="form-grid">
+                            <label class="field field-wide"><span>Competențe</span><textarea name="skills" maxlength="2000" rows="3" placeholder="Leadership · Research · Product strategy"></textarea></label>
+                            <label class="field field-wide"><span>Competențe digitale</span><textarea name="digital_skills" maxlength="2000" rows="3" placeholder="Figma · Jira · Notion · HTML/CSS"></textarea></label>
+                            <label class="field"><span>Limbi</span><textarea name="languages" maxlength="2000" rows="3" placeholder="Română — nativ&#10;Engleză — C1"></textarea></label>
+                            <label class="field"><span>Certificări</span><textarea name="certifications" maxlength="2000" rows="3" placeholder="Certificare · Emitent · An"></textarea></label>
+                            <label class="field"><span>Proiecte</span><textarea name="projects" maxlength="3000" rows="4" placeholder="Proiect, rol și rezultat..."></textarea></label>
+                            <label class="field"><span>Voluntariat / realizări</span><textarea name="additional" maxlength="3000" rows="4" placeholder="Activități, premii sau publicații..."></textarea></label>
+                        </div>
+                    </section>
+                </section>
+
+                <aside class="builder-side">
+                    <section class="template-panel">
+                        <div class="panel-title"><span>ALEGE FORMATUL</span><span class="info-icon">i</span></div>
+                        <div class="template-picker">
+                            <label class="template-option selected">
+                                <input type="radio" name="template" value="europass" checked>
+                                <span class="template-swatch europass-swatch"></span>
+                                <span><strong>Europass-inspired</strong><small>Familiar · European</small></span>
+                            </label>
+                            <label class="template-option">
+                                <input type="radio" name="template" value="ats">
+                                <span class="template-swatch ats-swatch"></span>
+                                <span><strong>ATS Classic</strong><small>Direct · Scan-friendly</small></span>
+                            </label>
+                            <label class="template-option">
+                                <input type="radio" name="template" value="modern">
+                                <span class="template-swatch modern-swatch"></span>
+                                <span><strong>Modern Minimal</strong><small>Distinct · Creative</small></span>
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="cv-preview-card europass" id="cv-preview">
+                        <div class="preview-paper-label"><span id="preview-template">EUROPASS-INSPIRED</span><small>LIVE PREVIEW</small></div>
+                        <div class="preview-person">
+                            <span class="preview-avatar">MW</span>
+                            <div><strong id="preview-name">NUMELE TĂU</strong><p id="preview-headline">Titlul profesional</p></div>
+                        </div>
+                        <p class="preview-contact" id="preview-contact">email · locație</p>
+                        <div class="preview-section"><span>PROFIL</span><p id="preview-summary">Un rezumat profesional concis va apărea aici.</p></div>
+                        <div class="preview-section"><span>EXPERIENȚĂ</span><i></i><i></i><i class="short"></i></div>
+                        <div class="preview-section"><span>EDUCAȚIE &amp; COMPETENȚE</span><i></i><i class="short"></i></div>
+                    </section>
+
+                    <div class="official-note">
+                        <strong>DESPRE FORMAT</strong>
+                        <p>Structura urmărește secțiunile Europass, dar documentul este creat independent și nu reprezintă un formular oficial al Uniunii Europene.</p>
+                        <a href="https://europass.europa.eu/en/create-europass-cv" target="_blank" rel="noreferrer">Deschide Europass oficial ↗</a>
+                    </div>
+
+                    <button type="submit" class="primary-action export-action"><span>↓</span> DESCARCĂ DOCX <b>→</b></button>
+                    <p class="local-footnote"><i></i>Datele rămân pe dispozitiv. Nu sunt trimise unui serviciu cloud.</p>
+                </aside>
+            </form>
+        </main>
+    </div>
+
+    <template id="experience-template">
+        <article class="repeatable-item">
+            <div class="repeatable-head"><strong>EXPERIENȚĂ</strong><button type="button" class="remove-row" aria-label="Șterge experiența">ȘTERGE</button></div>
+            <div class="form-grid">
+                <label class="field"><span>Rol</span><input name="experience_role" maxlength="180" placeholder="Senior Product Designer"></label>
+                <label class="field"><span>Organizație</span><input name="experience_organization" maxlength="180" placeholder="Company Studio"></label>
+                <label class="field"><span>Perioadă</span><input name="experience_dates" maxlength="100" placeholder="2023 — Prezent"></label>
+                <label class="field"><span>Locație</span><input name="experience_location" maxlength="120" placeholder="Remote"></label>
+                <label class="field field-wide"><span>Realizări / responsabilități</span><textarea name="experience_details" maxlength="4000" rows="4" placeholder="Câte o realizare pe fiecare rând..."></textarea></label>
+            </div>
+        </article>
+    </template>
+    <template id="education-template">
+        <article class="repeatable-item">
+            <div class="repeatable-head"><strong>EDUCAȚIE</strong><button type="button" class="remove-row" aria-label="Șterge educația">ȘTERGE</button></div>
+            <div class="form-grid">
+                <label class="field"><span>Calificare</span><input name="education_qualification" maxlength="180" placeholder="Licență · Design"></label>
+                <label class="field"><span>Instituție</span><input name="education_institution" maxlength="180" placeholder="Universitatea..."></label>
+                <label class="field"><span>Perioadă</span><input name="education_dates" maxlength="100" placeholder="2019 — 2022"></label>
+                <label class="field"><span>Locație</span><input name="education_location" maxlength="120" placeholder="București"></label>
+                <label class="field field-wide"><span>Detalii</span><textarea name="education_details" maxlength="3000" rows="3" placeholder="Specializare și rezultate relevante..."></textarea></label>
+            </div>
+        </article>
+    </template>
+    <script src="{{ url_for('static', filename='builder.js') }}" defer></script>
+</body>
+</html>

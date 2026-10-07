@@ -1,6 +1,7 @@
 import io
 import tempfile
 import unittest
+from docx import Document
 from pathlib import Path
 from unittest.mock import patch
 
@@ -27,6 +28,44 @@ class AppTests(unittest.TestCase):
         self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
         self.assertEqual(response.headers["X-Frame-Options"], "DENY")
         self.assertIn("frame-ancestors 'none'", response.headers["Content-Security-Policy"])
+
+    def test_builder_page_is_available(self):
+        response = self.client.get("/builder")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("CREEAZĂ CV".encode(), response.data)
+
+    def test_builder_export_requires_csrf_token(self):
+        response = self.client.post(
+            "/builder/export",
+            data={"full_name": "Alex Morgan", "template": "ats"},
+            follow_redirects=True,
+        )
+
+        self.assertIn("Sesiunea a expirat".encode(), response.data)
+
+    def test_builder_exports_valid_docx(self):
+        response = self.client.post(
+            "/builder/export",
+            data={
+                "csrf_token": self.csrf_token(),
+                "template": "modern",
+                "full_name": "Alex Morgan",
+                "headline": "Product Designer",
+                "experience_role": "Lead Designer",
+                "experience_organization": "MORPH WRLD",
+                "experience_details": "Created a design system.",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.mimetype,
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+        self.assertIn("Alex_Morgan-CV-modern.docx", response.headers["Content-Disposition"])
+        document = Document(io.BytesIO(response.data))
+        self.assertIn("Alex Morgan", "\n".join(paragraph.text for paragraph in document.paragraphs))
 
     def test_post_requires_csrf_token(self):
         response = self.client.post(

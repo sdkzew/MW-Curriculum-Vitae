@@ -5,11 +5,13 @@ import tempfile
 import threading
 from pathlib import Path
 
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, send_file, session, url_for
 from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.serving import make_server
+from werkzeug.utils import secure_filename
 
 from analyzer.ats_scorer import score_cv
+from analyzer.cv_builder import CVBuildError, build_cv_document, profile_from_form
 from analyzer.extractor import DocumentExtractionError, extract_text
 from analyzer.matcher import match_job
 from analyzer.suggestions import generate_suggestions
@@ -74,6 +76,37 @@ def create_app(upload_folder: str | None = None, testing: bool = False) -> Flask
     @app.get("/")
     def index():
         return render_template("index.html")
+
+    @app.get("/builder")
+    def builder():
+        return render_template("builder.html")
+
+    @app.post("/builder/export")
+    def export_cv():
+        submitted_token = request.form.get("csrf_token", "")
+        expected_token = session.get("csrf_token", "")
+        if not expected_token or not secrets.compare_digest(submitted_token, expected_token):
+            flash("Sesiunea a expirat. Incearca din nou.")
+            return redirect(url_for("builder"))
+
+        try:
+            profile, template = profile_from_form(request.form)
+            document = build_cv_document(profile, template)
+        except CVBuildError as error:
+            flash(str(error))
+            return redirect(url_for("builder"))
+
+        safe_name = secure_filename(profile.full_name) or "Curriculum-Vitae"
+        return send_file(
+            document,
+            as_attachment=True,
+            download_name=f"{safe_name}-CV-{template}.docx",
+            mimetype=(
+                "application/vnd.openxmlformats-officedocument."
+                "wordprocessingml.document"
+            ),
+            max_age=0,
+        )
 
     @app.post("/analyze")
     def analyze():
@@ -154,7 +187,7 @@ def run_desktop() -> None:
         import webview
 
         webview.create_window(
-            title="MORPH WRLD — CV Studio",
+            title="MORPH WRLD — Curriculum Vitae",
             url=f"http://127.0.0.1:{server.server_port}",
             width=1440,
             height=900,

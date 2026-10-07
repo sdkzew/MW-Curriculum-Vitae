@@ -154,11 +154,11 @@ def run_desktop() -> None:
         import webview
 
         webview.create_window(
-            title="AI CV Analyzer",
+            title="MORPH WRLD — CV Studio",
             url=f"http://127.0.0.1:{server.server_port}",
-            width=900,
-            height=750,
-            min_size=(700, 600),
+            width=1440,
+            height=900,
+            min_size=(980, 680),
             resizable=True,
         )
         webview.start()

@@ -64,7 +64,7 @@ class AppTests(unittest.TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Scor ATS".encode(), response.data)
+        self.assertIn("SCOR ATS".encode(), response.data)
         self.assertEqual(list(Path(self.upload_directory.name).iterdir()), [])
 
 

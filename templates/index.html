@@ -3,59 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI CV Analyzer</title>
+    <meta name="theme-color" content="#08080c">
+    <title>MORPH WRLD — CV Studio</title>
+    <link rel="icon" href="{{ url_for('static', filename='mw-mark.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>AI CV Analyzer</h1>
-            <p class="subtitle">Analizeaza compatibilitatea CV-ului tau cu sistemele ATS si primeste sugestii de imbunatatire</p>
-        </header>
+<body class="upload-page">
+    <div class="app-shell">
+        <aside class="step-rail" aria-label="Progres analiză">
+            <a href="/" class="rail-logo" aria-label="MORPH WRLD CV Studio">
+                <img src="{{ url_for('static', filename='mw-mark.svg') }}" alt="MORPH WRLD">
+            </a>
+            <div class="rail-line" aria-hidden="true"></div>
+            <ol class="steps">
+                <li class="step active">
+                    <span class="step-dot"><span></span></span>
+                    <span class="step-number">01</span>
+                    <span class="step-name">CV</span>
+                </li>
+                <li class="step">
+                    <span class="step-dot"></span>
+                    <span class="step-number">02</span>
+                    <span class="step-name">ROL</span>
+                </li>
+                <li class="step">
+                    <span class="step-dot"></span>
+                    <span class="step-number">03</span>
+                    <span class="step-name">ANALIZĂ</span>
+                </li>
+            </ol>
+            <span class="rail-version">v1.1</span>
+        </aside>
 
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <div class="alert">
-              {% for msg in messages %}<p>{{ msg }}</p>{% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+        <main class="workspace">
+            <header class="topbar">
+                <div class="brand-lockup">
+                    <strong>MORPH WRLD</strong>
+                    <span></span>
+                    <small>CV STUDIO</small>
+                </div>
+                <div class="privacy-strip">
+                    <span class="local-pill"><i></i>Procesare locală</span>
+                    <span class="privacy-copy">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.4c0 4.6 3.1 8.8 7.5 9.6 4.4-.8 7.5-5 7.5-9.6V6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg>
+                        Fișierul se șterge automat
+                    </span>
+                </div>
+            </header>
 
-        <form action="/analyze" method="POST" enctype="multipart/form-data" class="upload-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="upload-section">
-                <label for="cv_file" class="upload-label">
-                    <div class="upload-box" id="upload-box">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/>
-                            <line x1="12" y1="3" x2="12" y2="15"/>
-                        </svg>
-                        <p id="upload-text">Trage CV-ul aici sau <span>selecteaza fisierul</span></p>
-                        <p class="file-hint">PDF sau DOCX · max 5MB</p>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert" role="alert">
+                        {% for msg in messages %}<p>{{ msg }}</p>{% endfor %}
                     </div>
-                </label>
-                <input type="file" id="cv_file" name="cv_file" accept=".pdf,.docx" required hidden>
-            </div>
+                {% endif %}
+            {% endwith %}
 
-            <div class="job-section">
-                <label for="job_description">
-                    Descrierea jobului <span class="optional">(optional — pentru match score)</span>
-                </label>
-                <textarea
-                    id="job_description"
-                    name="job_description"
-                    rows="6"
-                    placeholder="Lipeste aici textul din anuntul de job pentru a vedea cat de bine se potriveste CV-ul tau..."
-                ></textarea>
-            </div>
+            <form action="/analyze" method="POST" enctype="multipart/form-data" class="analysis-layout">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <button type="submit" class="btn-analyze">Analizeaza CV-ul</button>
-        </form>
+                <section class="editor-pane">
+                    <div class="page-intro">
+                        <span class="eyebrow">ANALIZĂ NOUĂ</span>
+                        <h1>Începe cu documentul tău.</h1>
+                        <p>Adaugă CV-ul pentru a verifica structura ATS, potrivirea cu rolul și pașii de îmbunătățire.</p>
+                    </div>
 
-        <footer>
-            <p>Analiza se face local &mdash; fisierul tau nu este stocat sau trimis nicaieri.</p>
-        </footer>
+                    <label for="cv_file" class="upload-canvas" id="upload-box">
+                        <span class="document-orbit" aria-hidden="true">
+                            <svg class="document-icon" viewBox="0 0 64 72">
+                                <path d="M14 4h24l14 14v46a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z"/>
+                                <path d="M38 4v14h14M22 34h20M22 44h20M22 54h13"/>
+                            </svg>
+                            <i class="orbit-dot dot-one"></i>
+                            <i class="orbit-dot dot-two"></i>
+                        </span>
+                        <strong id="upload-text">TRAGE CV-UL AICI</strong>
+                        <span class="select-copy">sau <u>alege un fișier</u></span>
+                        <small>PDF · DOCX · MAX 5 MB</small>
+                    </label>
+                    <input type="file" id="cv_file" name="cv_file" accept=".pdf,.docx" required hidden>
+
+                    <div class="job-field">
+                        <div class="field-heading">
+                            <label for="job_description">DESCRIERE JOB</label>
+                            <span>Opțional</span>
+                        </div>
+                        <div class="textarea-shell">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 13.4a4 4 0 0 0 5.7 0l2.1-2.1a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M13.4 10.6a4 4 0 0 0-5.7 0l-2.1 2.1a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg>
+                            <textarea id="job_description" name="job_description" rows="2" maxlength="50000" placeholder="Lipește linkul sau descrierea rolului..."></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="preview-panel">
+                    <div class="panel-title">
+                        <span>PREVIEW ANALIZĂ</span>
+                        <span class="info-icon">i</span>
+                    </div>
+
+                    <div class="preview-scores">
+                        <div class="preview-score"><span class="empty-ring">--</span><small>ATS</small></div>
+                        <div class="preview-score"><span class="empty-ring">--</span><small>MATCH</small></div>
+                        <div class="preview-score"><span class="empty-ring">--</span><small>CLARITATE</small></div>
+                    </div>
+
+                    <div class="preview-checks">
+                        <div><span class="mini-icon">▤</span><p>Structură &amp; format ATS</p><i></i></div>
+                        <div><span class="mini-icon">◎</span><p>Potrivire cu rolul</p><i></i></div>
+                        <div><span class="mini-icon">◇</span><p>Claritate &amp; impact</p><i></i></div>
+                        <div><span class="mini-icon">▥</span><p>Pași de îmbunătățire</p><i></i></div>
+                    </div>
+
+                    <div class="preview-note">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5"/></svg>
+                        <p>Încarcă un CV pentru a vedea previzualizarea analizei.</p>
+                    </div>
+
+                    <button type="submit" class="primary-action">
+                        <span>✦</span> ANALIZEAZĂ CV-UL <b>→</b>
+                    </button>
+                </aside>
+            </form>
+        </main>
     </div>
 
     <script src="{{ url_for('static', filename='index.js') }}" defer></script>

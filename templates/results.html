@@ -3,130 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rezultate Analiza CV</title>
+    <meta name="theme-color" content="#08080c">
+    <title>Rezultate — MORPH WRLD CV Studio</title>
+    <link rel="icon" href="{{ url_for('static', filename='mw-mark.svg') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>AI CV Analyzer</h1>
-            <a href="/" class="btn-back">← Analizeaza alt CV</a>
-        </header>
+<body class="results-page">
+    <div class="app-shell">
+        <aside class="step-rail" aria-label="Progres analiză">
+            <a href="/" class="rail-logo" aria-label="MORPH WRLD CV Studio">
+                <img src="{{ url_for('static', filename='mw-mark.svg') }}" alt="MORPH WRLD">
+            </a>
+            <div class="rail-line" aria-hidden="true"></div>
+            <ol class="steps">
+                <li class="step complete"><span class="step-dot">✓</span><span class="step-number">01</span><span class="step-name">CV</span></li>
+                <li class="step {% if has_job %}complete{% endif %}"><span class="step-dot">{% if has_job %}✓{% endif %}</span><span class="step-number">02</span><span class="step-name">ROL</span></li>
+                <li class="step active"><span class="step-dot"><span></span></span><span class="step-number">03</span><span class="step-name">ANALIZĂ</span></li>
+            </ol>
+            <span class="rail-version">v1.1</span>
+        </aside>
 
-        <!-- ATS Score -->
-        <section class="card score-card">
-            <h2>Scor ATS</h2>
-            <div class="score-ring-wrap">
-                <svg class="score-ring" viewBox="0 0 120 120">
-                    <circle class="ring-bg" cx="60" cy="60" r="50"/>
-                    <circle class="ring-fill" cx="60" cy="60" r="50"
-                        stroke-dasharray="{{ (ats.score / 100 * 314) | round(1) }} 314"
-                        data-score="{{ ats.score }}"/>
-                </svg>
-                <div class="score-center">
-                    <span class="score-number">{{ ats.score }}</span>
-                    <span class="score-max">/100</span>
+        <main class="workspace results-workspace">
+            <header class="topbar">
+                <div class="brand-lockup"><strong>MORPH WRLD</strong><span></span><small>CV STUDIO</small></div>
+                <div class="privacy-strip">
+                    <span class="local-pill"><i></i>Analiză finalizată</span>
+                    <a href="/" class="new-analysis">＋ ANALIZĂ NOUĂ</a>
                 </div>
-            </div>
-            <p class="score-label {% if ats.score >= 75 %}good{% elif ats.score >= 50 %}medium{% else %}low{% endif %}">
-                {% if ats.score >= 75 %}Excelent{% elif ats.score >= 50 %}Bun{% elif ats.score >= 30 %}Mediu{% else %}Slab{% endif %}
-            </p>
+            </header>
 
-            <div class="breakdown">
-                <h3>Detalii scor</h3>
-                {% for label, (got, total) in ats.breakdown.items() %}
-                <div class="breakdown-row">
-                    <span class="breakdown-label">{{ label }}</span>
-                    <div class="progress-bar">
-                        <div class="progress-fill" data-percent="{{ (got / total * 100) | round }}"></div>
+            <div class="results-intro">
+                <div>
+                    <span class="eyebrow">RAPORT CV</span>
+                    <h1>Profilul tău, în clar.</h1>
+                    <p>{{ word_count }} cuvinte analizate · Scorurile sunt orientative și explicabile.</p>
+                </div>
+                <div class="result-status"><i></i>PROCESAT LOCAL</div>
+            </div>
+
+            <div class="results-grid">
+                <section class="result-card score-overview">
+                    <div class="card-heading"><span>SCOR ATS</span><small>Structură &amp; lizibilitate</small></div>
+                    <div class="score-hero">
+                        <div class="score-ring-wrap">
+                            <svg class="score-ring" viewBox="0 0 120 120" aria-hidden="true">
+                                <circle class="ring-bg" cx="60" cy="60" r="50"/>
+                                <circle class="ring-fill" cx="60" cy="60" r="50" stroke-dasharray="{{ (ats.score / 100 * 314) | round(1) }} 314" data-score="{{ ats.score }}"/>
+                            </svg>
+                            <div class="score-center"><span class="score-number">{{ ats.score }}</span><span class="score-max">/100</span></div>
+                        </div>
+                        <div class="score-summary">
+                            <span class="score-label {% if ats.score >= 75 %}good{% elif ats.score >= 50 %}medium{% else %}low{% endif %}">
+                                {% if ats.score >= 75 %}Excelent{% elif ats.score >= 50 %}Bun{% elif ats.score >= 30 %}Mediu{% else %}Necesită atenție{% endif %}
+                            </span>
+                            <p>Evaluare bazată pe structură, contact, verbe de acțiune, rezultate măsurabile și lungime.</p>
+                        </div>
                     </div>
-                    <span class="breakdown-pts">{{ got }}/{{ total }}</span>
-                </div>
-                {% endfor %}
-            </div>
+                </section>
 
-            {% if ats.feedback %}
-            <div class="feedback-list">
-                <h3>Feedback ATS</h3>
-                {% for f in ats.feedback %}
-                <div class="feedback-item">⚠ {{ f }}</div>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </section>
+                <section class="result-card match-overview">
+                    <div class="card-heading"><span>POTRIVIRE ROL</span><small>{% if has_job %}Cuvinte-cheie relevante{% else %}Fără descriere de job{% endif %}</small></div>
+                    {% if has_job %}
+                        <div class="match-hero"><strong class="match-number {% if match.score >= 75 %}good{% elif match.score >= 50 %}medium{% else %}low{% endif %}">{{ match.score }}<small>%</small></strong><p>{{ match.feedback }}</p></div>
+                    {% else %}
+                        <div class="empty-match"><strong>—</strong><p>Adaugă un job la următoarea analiză pentru un scor de potrivire.</p></div>
+                    {% endif %}
+                </section>
 
-        <!-- Job Match -->
-        {% if has_job %}
-        <section class="card match-card">
-            <h2>Compatibilitate Job</h2>
-            <div class="match-score-wrap">
-                <div class="match-number {% if match.score >= 75 %}good{% elif match.score >= 50 %}medium{% else %}low{% endif %}">
-                    {{ match.score }}%
-                </div>
-                <p class="match-feedback">{{ match.feedback }}</p>
-            </div>
-
-            <div class="keywords-wrap">
-                {% if match.matched_keywords %}
-                <div class="keyword-group">
-                    <h3>✓ Cuvinte cheie gasite ({{ match.matched_keywords | length }})</h3>
-                    <div class="tags">
-                        {% for kw in match.matched_keywords %}
-                        <span class="tag tag-green">{{ kw }}</span>
+                <section class="result-card breakdown-card">
+                    <div class="card-heading"><span>STRUCTURA SCORULUI</span><small>Ce a influențat rezultatul</small></div>
+                    <div class="breakdown">
+                        {% for label, (got, total) in ats.breakdown.items() %}
+                        <div class="breakdown-row">
+                            <span class="breakdown-label">{{ label }}</span>
+                            <div class="progress-bar"><div class="progress-fill" data-percent="{{ (got / total * 100) | round }}"></div></div>
+                            <span class="breakdown-pts">{{ got }}/{{ total }}</span>
+                        </div>
                         {% endfor %}
                     </div>
-                </div>
+                </section>
+
+                <section class="result-card sections-card">
+                    <div class="card-heading"><span>SECȚIUNI DETECTATE</span><small>{{ ats.found_sections | length }} din {{ (ats.found_sections | length) + (ats.missing_sections | length) }}</small></div>
+                    <div class="sections-grid">
+                        {% for section in ats.found_sections %}<span class="section-chip found">✓ {{ section }}</span>{% endfor %}
+                        {% for section in ats.missing_sections %}<span class="section-chip missing">× {{ section }}</span>{% endfor %}
+                    </div>
+                </section>
+
+                {% if has_job %}
+                <section class="result-card keywords-card">
+                    <div class="card-heading"><span>HARTA CUVINTELOR-CHEIE</span><small>Potriviri și oportunități</small></div>
+                    <div class="keywords-wrap">
+                        {% if match.matched_keywords %}<div class="keyword-group"><h3>Găsite</h3><div class="tags">{% for keyword in match.matched_keywords %}<span class="tag tag-green">{{ keyword }}</span>{% endfor %}</div></div>{% endif %}
+                        {% if match.missing_keywords %}<div class="keyword-group"><h3>De integrat natural</h3><div class="tags">{% for keyword in match.missing_keywords %}<span class="tag tag-red">{{ keyword }}</span>{% endfor %}</div></div>{% endif %}
+                    </div>
+                </section>
                 {% endif %}
 
-                {% if match.missing_keywords %}
-                <div class="keyword-group">
-                    <h3>✗ Cuvinte cheie lipsa ({{ match.missing_keywords | length }})</h3>
-                    <div class="tags">
-                        {% for kw in match.missing_keywords %}
-                        <span class="tag tag-red">{{ kw }}</span>
+                <section class="result-card suggestions-card">
+                    <div class="card-heading"><span>PLAN DE ACȚIUNE</span><small>Recomandări prioritizate</small></div>
+                    <div class="suggestions-list">
+                        {% for suggestion in suggestions %}
+                        <article class="suggestion priority-{{ suggestion.priority }}">
+                            <div class="suggestion-index">{{ '%02d' | format(loop.index) }}</div>
+                            <div>
+                                <div class="suggestion-header">
+                                    <span class="priority-badge {{ suggestion.priority }}">{{ 'Urgent' if suggestion.priority == 'high' else ('Recomandat' if suggestion.priority == 'medium' else 'Opțional') }}</span>
+                                    <span class="suggestion-category">{{ suggestion.category }}</span>
+                                </div>
+                                <p>{{ suggestion.text }}</p>
+                            </div>
+                        </article>
                         {% endfor %}
                     </div>
-                </div>
+                </section>
+
+                {% if ats.feedback %}
+                <section class="result-card feedback-card">
+                    <div class="card-heading"><span>OBSERVAȚII ATS</span><small>Detalii tehnice</small></div>
+                    {% for feedback in ats.feedback %}<div class="feedback-item"><span>!</span>{{ feedback }}</div>{% endfor %}
+                </section>
                 {% endif %}
             </div>
-        </section>
-        {% endif %}
-
-        <!-- Sections -->
-        <section class="card sections-card">
-            <h2>Sectiuni CV</h2>
-            <div class="sections-grid">
-                {% for s in ats.found_sections %}
-                <div class="section-chip found">✓ {{ s }}</div>
-                {% endfor %}
-                {% for s in ats.missing_sections %}
-                <div class="section-chip missing">✗ {{ s }}</div>
-                {% endfor %}
-            </div>
-            <p class="word-count">Numar cuvinte detectate: <strong>{{ word_count }}</strong></p>
-        </section>
-
-        <!-- Suggestions -->
-        <section class="card suggestions-card">
-            <h2>Sugestii de Imbunatatire</h2>
-            {% for s in suggestions %}
-            <div class="suggestion priority-{{ s.priority }}">
-                <div class="suggestion-header">
-                    <span class="priority-badge {{ s.priority }}">
-                        {{ 'Urgent' if s.priority == 'high' else ('Recomandat' if s.priority == 'medium' else 'Optional') }}
-                    </span>
-                    <span class="suggestion-category">{{ s.category }}</span>
-                </div>
-                <p>{{ s.text }}</p>
-            </div>
-            {% endfor %}
-        </section>
-
-        <footer>
-            <a href="/" class="btn-analyze">Analizeaza alt CV</a>
-        </footer>
+        </main>
     </div>
-
     <script src="{{ url_for('static', filename='results.js') }}" defer></script>
 </body>
 </html>

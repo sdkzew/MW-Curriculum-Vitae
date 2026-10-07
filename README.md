@@ -1,8 +1,36 @@
-# AI CV Analyzer
+<p align="center">
+  <img src="static/mw-mark.svg" width="84" alt="MORPH WRLD logo">
+</p>
 
-A small desktop application that extracts text from a PDF or DOCX CV, calculates a transparent heuristic ATS score, compares it with an optional job description, and suggests improvements. Processing happens locally; uploaded files are placed in a temporary folder and removed after each analysis.
+<h1 align="center">MORPH WRLD — CV Studio</h1>
 
-> The scores are guidance only. They do not reproduce a specific employer's applicant-tracking system and are not hiring decisions.
+<p align="center">
+  Local-first CV analysis with transparent ATS scoring, job matching, and practical improvement suggestions.
+</p>
+
+CV Studio extracts text from PDF and DOCX documents, scores common ATS signals, compares the CV with an optional role description, and turns the result into a prioritized action plan. No external AI service or account is required.
+
+> Scores are heuristic guidance. They do not reproduce a specific employer's applicant-tracking system and are not hiring decisions.
+
+## Interface
+
+### New analysis
+
+![MORPH WRLD CV Studio upload workspace](docs/screenshots/cv-studio-upload.png)
+
+### Results dashboard
+
+![MORPH WRLD CV Studio results dashboard](docs/screenshots/cv-studio-results.png)
+
+## Highlights
+
+- Clear ATS score with a visible category breakdown
+- Optional job-description match and missing-keyword map
+- Prioritized, practical improvement suggestions
+- PDF and DOCX support, including text stored in DOCX tables
+- Local processing with automatic temporary-file cleanup
+- No external API or cloud upload
+- Native Windows window powered by pywebview
 
 ## Run from source
 
@@ -14,7 +42,7 @@ python -m venv .venv
 .venv\Scripts\python.exe app.py
 ```
 
-The desktop window uses pywebview and an internal Flask server bound only to a random local port.
+The desktop window starts an internal Flask server bound only to a random loopback port.
 
 ## Build the Windows executable
 
@@ -23,7 +51,7 @@ The desktop window uses pywebview and an internal Flask server bound only to a r
 .\build.ps1
 ```
 
-The executable is written to `dist\AI-CV-Analyzer.exe`.
+The executable is written to `dist\MORPH-WRLD-CV-Studio.exe`.
 
 ## Tests
 

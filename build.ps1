@@ -10,6 +10,7 @@ if (-not (Test-Path ".venv\Scripts\python.exe")) {
     --onefile `
     --windowed `
     --name "MW-Curriculum-Vitae" `
+    --icon "static\mw-icon.ico" `
     --add-data "templates;templates" `
     --add-data "static;static" `
     --collect-all webview `

@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#08080c">
-    <title>MORPH WRLD — CV Studio</title>
-    <link rel="icon" href="{{ url_for('static', filename='mw-mark.svg') }}">
+    <title>{{ t('app_title') }}</title>
+    <link rel="icon" href="{{ url_for('static', filename='mw-icon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="upload-page">
     <div class="app-shell">
-        <aside class="step-rail" aria-label="Progres analiză">
+        <aside class="step-rail" aria-label="{{ t('analysis_progress') }}">
             <a href="/" class="rail-logo" aria-label="MORPH WRLD CV Studio">
                 <img src="{{ url_for('static', filename='mw-mark.svg') }}" alt="MORPH WRLD">
             </a>
@@ -19,20 +19,20 @@
                 <li class="step active">
                     <span class="step-dot"><span></span></span>
                     <span class="step-number">01</span>
-                    <span class="step-name">CV</span>
+                    <span class="step-name">{{ t('cv') }}</span>
                 </li>
                 <li class="step">
                     <span class="step-dot"></span>
                     <span class="step-number">02</span>
-                    <span class="step-name">ROL</span>
+                    <span class="step-name">{{ t('role') }}</span>
                 </li>
                 <li class="step">
                     <span class="step-dot"></span>
                     <span class="step-number">03</span>
-                    <span class="step-name">ANALIZĂ</span>
+                    <span class="step-name">{{ t('analysis') }}</span>
                 </li>
             </ol>
-            <span class="rail-version">v1.2</span>
+            <span class="rail-version">v1.3</span>
         </aside>
 
         <main class="workspace">
@@ -42,16 +42,24 @@
                     <span></span>
                     <small>CV STUDIO</small>
                 </div>
-                <nav class="mode-switch" aria-label="Mod aplicație">
-                    <a href="/" class="active" aria-current="page">ANALIZEAZĂ</a>
-                    <a href="/builder">CREEAZĂ CV</a>
+                <nav class="mode-switch" aria-label="{{ t('app_mode') }}">
+                    <a href="/" class="active" aria-current="page">{{ t('analyze') }}</a>
+                    <a href="/builder">{{ t('create_cv') }}</a>
                 </nav>
-                <div class="privacy-strip">
-                    <span class="local-pill"><i></i>Procesare locală</span>
-                    <span class="privacy-copy">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.4c0 4.6 3.1 8.8 7.5 9.6 4.4-.8 7.5-5 7.5-9.6V6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg>
-                        Fișierul se șterge automat
-                    </span>
+                <div class="topbar-actions">
+                    <form method="POST" class="language-switch" aria-label="Language">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="next" value="/">
+                        <button formaction="/language/ro" class="{% if lang == 'ro' %}active{% endif %}">RO</button>
+                        <button formaction="/language/en" class="{% if lang == 'en' %}active{% endif %}">EN</button>
+                    </form>
+                    <div class="privacy-strip">
+                        <span class="local-pill"><i></i>{{ t('local_processing') }}</span>
+                        <span class="privacy-copy">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.4c0 4.6 3.1 8.8 7.5 9.6 4.4-.8 7.5-5 7.5-9.6V6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg>
+                            {{ t('file_auto_deleted') }}
+                        </span>
+                    </div>
                 </div>
             </header>
 
@@ -68,9 +76,9 @@
 
                 <section class="editor-pane">
                     <div class="page-intro">
-                        <span class="eyebrow">ANALIZĂ NOUĂ</span>
-                        <h1>Începe cu documentul tău.</h1>
-                        <p>Adaugă CV-ul pentru a verifica structura ATS, potrivirea cu rolul și pașii de îmbunătățire.</p>
+                        <span class="eyebrow">{{ t('new_analysis') }}</span>
+                        <h1>{{ t('start_document') }}</h1>
+                        <p>{{ t('upload_intro') }}</p>
                     </div>
 
                     <label for="cv_file" class="upload-canvas" id="upload-box">
@@ -82,50 +90,50 @@
                             <i class="orbit-dot dot-one"></i>
                             <i class="orbit-dot dot-two"></i>
                         </span>
-                        <strong id="upload-text">TRAGE CV-UL AICI</strong>
-                        <span class="select-copy">sau <u>alege un fișier</u></span>
+                        <strong id="upload-text">{{ t('drag_cv') }}</strong>
+                        <span class="select-copy">{{ t('or_choose_file') }} <u>{{ t('choose_file') }}</u></span>
                         <small>PDF · DOCX · MAX 5 MB</small>
                     </label>
                     <input type="file" id="cv_file" name="cv_file" accept=".pdf,.docx" required hidden>
 
                     <div class="job-field">
                         <div class="field-heading">
-                            <label for="job_description">DESCRIERE JOB</label>
-                            <span>Opțional</span>
+                            <label for="job_description">{{ t('job_description') }}</label>
+                            <span>{{ t('optional') }}</span>
                         </div>
                         <div class="textarea-shell">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 13.4a4 4 0 0 0 5.7 0l2.1-2.1a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M13.4 10.6a4 4 0 0 0-5.7 0l-2.1 2.1a4 4 0 0 0 5.7 5.7l1.2-1.2"/></svg>
-                            <textarea id="job_description" name="job_description" rows="2" maxlength="50000" placeholder="Lipește linkul sau descrierea rolului..."></textarea>
+                            <textarea id="job_description" name="job_description" rows="2" maxlength="50000" placeholder="{{ t('job_placeholder') }}"></textarea>
                         </div>
                     </div>
                 </section>
 
                 <aside class="preview-panel">
                     <div class="panel-title">
-                        <span>PREVIEW ANALIZĂ</span>
+                        <span>{{ t('analysis_preview') }}</span>
                         <span class="info-icon">i</span>
                     </div>
 
                     <div class="preview-scores">
                         <div class="preview-score"><span class="empty-ring">--</span><small>ATS</small></div>
-                        <div class="preview-score"><span class="empty-ring">--</span><small>MATCH</small></div>
-                        <div class="preview-score"><span class="empty-ring">--</span><small>CLARITATE</small></div>
+                        <div class="preview-score"><span class="empty-ring">--</span><small>{{ t('match') }}</small></div>
+                        <div class="preview-score"><span class="empty-ring">--</span><small>{{ t('clarity') }}</small></div>
                     </div>
 
                     <div class="preview-checks">
-                        <div><span class="mini-icon">▤</span><p>Structură &amp; format ATS</p><i></i></div>
-                        <div><span class="mini-icon">◎</span><p>Potrivire cu rolul</p><i></i></div>
-                        <div><span class="mini-icon">◇</span><p>Claritate &amp; impact</p><i></i></div>
-                        <div><span class="mini-icon">▥</span><p>Pași de îmbunătățire</p><i></i></div>
+                        <div><span class="mini-icon">▤</span><p>{{ t('ats_structure') }}</p><i></i></div>
+                        <div><span class="mini-icon">◎</span><p>{{ t('role_fit') }}</p><i></i></div>
+                        <div><span class="mini-icon">◇</span><p>{{ t('clarity_impact') }}</p><i></i></div>
+                        <div><span class="mini-icon">▥</span><p>{{ t('improvement_steps') }}</p><i></i></div>
                     </div>
 
                     <div class="preview-note">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5"/></svg>
-                        <p>Încarcă un CV pentru a vedea previzualizarea analizei.</p>
+                        <p>{{ t('upload_preview_note') }}</p>
                     </div>
 
                     <button type="submit" class="primary-action">
-                        <span>✦</span> ANALIZEAZĂ CV-UL <b>→</b>
+                        <span>✦</span> {{ t('analyze_cv') }} <b>→</b>
                     </button>
                 </aside>
             </form>

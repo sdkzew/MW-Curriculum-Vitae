@@ -8,7 +8,7 @@
   Local-first CV analysis and creation with transparent ATS scoring, editable DOCX export, and practical improvement suggestions.
 </p>
 
-MORPH WRLD Curriculum Vitae extracts text from PDF and DOCX documents, scores common ATS signals, compares the CV with an optional role description, and turns the result into a prioritized action plan. Its CV Builder also creates an editable DOCX from structured career information. No external AI service or account is required.
+MORPH WRLD Curriculum Vitae extracts text from PDF and DOCX documents, scores common ATS signals, compares the CV with an optional role description, and turns the result into a prioritized action plan. Its bilingual CV Builder also creates an editable DOCX from structured career information and an optional profile photo. No external AI service or account is required.
 
 > Scores are heuristic guidance. They do not reproduce a specific employer's applicant-tracking system and are not hiring decisions.
 
@@ -35,6 +35,9 @@ MORPH WRLD Curriculum Vitae extracts text from PDF and DOCX documents, scores co
 - Local processing with automatic temporary-file cleanup
 - No external API or cloud upload
 - Native Windows window powered by pywebview
+- Complete Romanian and English interface, analysis, guidance, and DOCX export
+- Optional JPG or PNG profile photo with local validation and circular cropping
+- Branded Windows executable and window icon
 - Built-in CV creator with repeatable experience and education sections
 - Three editable DOCX styles: Europass-inspired, ATS Classic, and Modern Minimal
 - Dedicated fields for language, digital, project, certification, and volunteering information
@@ -71,6 +74,7 @@ The executable is written to `dist\MW-Curriculum-Vitae.exe`.
 ## Safety limits
 
 - PDF and DOCX only, up to 5 MB per upload
+- Optional profile photo in JPG or PNG format, up to 3 MB and 20 megapixels
 - Up to 50 PDF pages
 - Up to 50 MB uncompressed DOCX content
 - Up to 500,000 extracted characters

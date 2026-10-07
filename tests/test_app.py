@@ -35,6 +35,17 @@ class AppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("CREEAZĂ CV".encode(), response.data)
 
+    def test_language_switch_translates_builder(self):
+        response = self.client.post(
+            "/language/en",
+            data={"csrf_token": self.csrf_token(), "next": "/builder"},
+            follow_redirects=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Build a CV that represents you.", response.data)
+        self.assertIn(b"CHOOSE PHOTO", response.data)
+
     def test_builder_export_requires_csrf_token(self):
         response = self.client.post(
             "/builder/export",

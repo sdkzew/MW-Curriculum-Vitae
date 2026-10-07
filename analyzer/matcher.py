@@ -26,15 +26,29 @@ def _tokenize(text: str) -> set:
     return {word for word in words if word not in stopwords} | technology_tokens
 
 
-def match_job(cv_text: str, job_text: str) -> MatchResult:
+def match_job(cv_text: str, job_text: str, language: str = "ro") -> MatchResult:
     if not job_text.strip():
-        return MatchResult(score=0, feedback="Nu a fost furnizata o descriere de job.")
+        return MatchResult(
+            score=0,
+            feedback=(
+                "Nu a fost furnizată o descriere de job."
+                if language == "ro"
+                else "No job description was provided."
+            ),
+        )
 
     cv_tokens = _tokenize(cv_text)
     job_tokens = _tokenize(job_text)
 
     if not job_tokens:
-        return MatchResult(score=0, feedback="Descrierea jobului nu contine text relevant.")
+        return MatchResult(
+            score=0,
+            feedback=(
+                "Descrierea jobului nu conține text relevant."
+                if language == "ro"
+                else "The job description does not contain relevant text."
+            ),
+        )
 
     matched = cv_tokens & job_tokens
     missing = job_tokens - cv_tokens
@@ -44,14 +58,24 @@ def match_job(cv_text: str, job_text: str) -> MatchResult:
 
     top_missing = sorted(missing, key=len, reverse=True)[:15]
 
-    if score >= 75:
-        feedback = "Potrivire excelenta! CV-ul tau acopera majoritatea cerintelor jobului."
-    elif score >= 50:
-        feedback = "Potrivire buna. Adauga cateva cuvinte cheie lipsa pentru a creste compatibilitatea."
-    elif score >= 30:
-        feedback = "Potrivire medie. CV-ul tau lipseste mai multe cuvinte cheie din descrierea jobului."
+    if language == "ro":
+        if score >= 75:
+            feedback = "Potrivire excelentă! CV-ul acoperă majoritatea cerințelor jobului."
+        elif score >= 50:
+            feedback = "Potrivire bună. Adaugă câteva cuvinte-cheie lipsă pentru compatibilitate mai bună."
+        elif score >= 30:
+            feedback = "Potrivire medie. CV-ului îi lipsesc mai multe cuvinte-cheie din descrierea jobului."
+        else:
+            feedback = "Potrivire slabă. Personalizează CV-ul pentru cerințele acestui job."
     else:
-        feedback = "Potrivire slaba. Considera personalizarea CV-ului specific pentru acest job."
+        if score >= 75:
+            feedback = "Excellent match! Your CV covers most of the job requirements."
+        elif score >= 50:
+            feedback = "Good match. Add a few missing keywords to improve compatibility."
+        elif score >= 30:
+            feedback = "Average match. Your CV is missing several keywords from the job description."
+        else:
+            feedback = "Low match. Tailor your CV more closely to this specific job."
 
     return MatchResult(
         score=score,

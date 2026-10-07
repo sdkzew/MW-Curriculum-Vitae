@@ -7,6 +7,7 @@ import docx
 from analyzer.ats_scorer import score_cv
 from analyzer.extractor import DocumentExtractionError, extract_text
 from analyzer.matcher import match_job
+from analyzer.suggestions import generate_suggestions
 
 
 class ATSScorerTests(unittest.TestCase):
@@ -32,6 +33,12 @@ class ATSScorerTests(unittest.TestCase):
         self.assertEqual(result.breakdown["Action Verbs"][0], 0)
         self.assertNotIn("summary", result.found_sections)
 
+    def test_feedback_can_be_generated_in_english(self):
+        result = score_cv("Short CV\n", "en")
+
+        self.assertIn("Add your email", result.feedback[0])
+        self.assertTrue(all("CV-ul" not in message for message in result.feedback))
+
 
 class MatcherTests(unittest.TestCase):
     def test_preserves_common_technology_names(self):
@@ -42,6 +49,19 @@ class MatcherTests(unittest.TestCase):
 
         self.assertEqual(result.score, 100)
         self.assertTrue({"c++", "c#", ".net", "node.js"}.issubset(result.matched_keywords))
+
+    def test_match_feedback_can_be_generated_in_english(self):
+        result = match_job("Python", "Python Django Kubernetes", "en")
+
+        self.assertEqual(result.feedback, "Average match. Your CV is missing several keywords from the job description.")
+
+
+class SuggestionsTests(unittest.TestCase):
+    def test_suggestions_can_be_generated_in_english(self):
+        result = generate_suggestions("Short CV", 20, 0, ["python"], "en")
+
+        self.assertEqual(result[0]["category"], "ATS compatibility")
+        self.assertTrue(all("Adaugă" not in item["text"] for item in result))
 
 
 class ExtractorTests(unittest.TestCase):

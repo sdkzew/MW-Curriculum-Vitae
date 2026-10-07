@@ -2,7 +2,6 @@ import re
 from dataclasses import dataclass, field
 from typing import List
 
-
 SECTION_KEYWORDS = {
     "contact": ["email", "phone", "telefon", "linkedin", "github", "adresa", "address"],
     "experience": ["experience", "experienta", "experiență", "work history", "employment", "job", "position", "rol"],
@@ -40,7 +39,7 @@ class ATSResult:
     missing_sections: List[str] = field(default_factory=list)
 
 
-def score_cv(text: str) -> ATSResult:
+def score_cv(text: str, language: str = "ro") -> ATSResult:
     result = ATSResult()
     lower = text.lower()
 
@@ -55,7 +54,11 @@ def score_cv(text: str) -> ATSResult:
     result.breakdown["Contact Info"] = (contact_score, 20)
     result.score += contact_score
     if contact_score < 15:
-        result.feedback.append("Adauga email, telefon si profil LinkedIn in sectiunea de contact.")
+        result.feedback.append(
+            "Adaugă emailul, telefonul și profilul LinkedIn în secțiunea de contact."
+            if language == "ro"
+            else "Add your email, phone number, and LinkedIn profile to the contact section."
+        )
 
     # 2. Sections present (30pts)
     section_score = 0
@@ -70,8 +73,11 @@ def score_cv(text: str) -> ATSResult:
     result.score += section_score
     if result.missing_sections:
         result.feedback.append(
-            f"Sectiuni lipsa sau nerecunoscute: {', '.join(result.missing_sections)}. "
-            "Asigura-te ca titlurile sectiunilor sunt clare."
+            (f"Secțiuni lipsă sau nerecunoscute: {', '.join(result.missing_sections)}. "
+             "Asigură-te că titlurile secțiunilor sunt clare.")
+            if language == "ro"
+            else (f"Missing or unrecognized sections: {', '.join(result.missing_sections)}. "
+                  "Make sure section headings are clear.")
         )
 
     # 3. Power words (15pts)
@@ -81,7 +87,9 @@ def score_cv(text: str) -> ATSResult:
     result.score += power_score
     if power_score < 8:
         result.feedback.append(
-            "Foloseste mai multe verbe de actiune (ex: developed, implemented, managed, improved)."
+            "Folosește mai multe verbe de acțiune (ex.: dezvoltat, implementat, coordonat, îmbunătățit)."
+            if language == "ro"
+            else "Use more action verbs (for example: developed, implemented, managed, improved)."
         )
 
     # 4. Quantifiable achievements (15pts)
@@ -91,7 +99,9 @@ def score_cv(text: str) -> ATSResult:
     result.score += quant_score
     if quant_score < 6:
         result.feedback.append(
-            "Adauga realizari masurate cu cifre (ex: '30% crestere vanzari', 'echipa de 5 persoane')."
+            "Adaugă realizări măsurate cu cifre (ex.: „30% creștere a vânzărilor”, „echipă de 5 persoane”)."
+            if language == "ro"
+            else "Add measurable achievements (for example: '30% sales growth' or 'team of 5 people')."
         )
 
     # 5. Length/word count (10pts)
@@ -105,9 +115,17 @@ def score_cv(text: str) -> ATSResult:
     result.breakdown["Length"] = (length_score, 10)
     result.score += length_score
     if len(words) < 300:
-        result.feedback.append(f"CV-ul are doar {len(words)} cuvinte. Extinde descrierile experientei (ideal 300-800 cuvinte).")
+        result.feedback.append(
+            f"CV-ul are doar {len(words)} cuvinte. Extinde descrierile experienței (ideal 300–800 de cuvinte)."
+            if language == "ro"
+            else f"The CV has only {len(words)} words. Expand the experience descriptions (ideally 300–800 words)."
+        )
     elif len(words) > 1000:
-        result.feedback.append(f"CV-ul are {len(words)} cuvinte — prea lung. Rezuma la 1-2 pagini.")
+        result.feedback.append(
+            f"CV-ul are {len(words)} cuvinte — este prea lung. Rezumă-l la 1–2 pagini."
+            if language == "ro"
+            else f"The CV has {len(words)} words — it is too long. Condense it to 1–2 pages."
+        )
 
     # 6. Formatting signals (10pts)
     fmt_score = 0

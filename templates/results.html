@@ -1,53 +1,61 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#08080c">
-    <title>Rezultate — MORPH WRLD CV Studio</title>
-    <link rel="icon" href="{{ url_for('static', filename='mw-mark.svg') }}">
+    <title>{{ t('cv_report') }} — MORPH WRLD</title>
+    <link rel="icon" href="{{ url_for('static', filename='mw-icon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="results-page">
     <div class="app-shell">
-        <aside class="step-rail" aria-label="Progres analiză">
+        <aside class="step-rail" aria-label="{{ t('analysis_progress') }}">
             <a href="/" class="rail-logo" aria-label="MORPH WRLD CV Studio">
                 <img src="{{ url_for('static', filename='mw-mark.svg') }}" alt="MORPH WRLD">
             </a>
             <div class="rail-line" aria-hidden="true"></div>
             <ol class="steps">
-                <li class="step complete"><span class="step-dot">✓</span><span class="step-number">01</span><span class="step-name">CV</span></li>
-                <li class="step {% if has_job %}complete{% endif %}"><span class="step-dot">{% if has_job %}✓{% endif %}</span><span class="step-number">02</span><span class="step-name">ROL</span></li>
-                <li class="step active"><span class="step-dot"><span></span></span><span class="step-number">03</span><span class="step-name">ANALIZĂ</span></li>
+                <li class="step complete"><span class="step-dot">✓</span><span class="step-number">01</span><span class="step-name">{{ t('cv') }}</span></li>
+                <li class="step {% if has_job %}complete{% endif %}"><span class="step-dot">{% if has_job %}✓{% endif %}</span><span class="step-number">02</span><span class="step-name">{{ t('role') }}</span></li>
+                <li class="step active"><span class="step-dot"><span></span></span><span class="step-number">03</span><span class="step-name">{{ t('analysis') }}</span></li>
             </ol>
-            <span class="rail-version">v1.2</span>
+            <span class="rail-version">v1.3</span>
         </aside>
 
         <main class="workspace results-workspace">
             <header class="topbar">
                 <div class="brand-lockup"><strong>MORPH WRLD</strong><span></span><small>CV STUDIO</small></div>
-                <nav class="mode-switch" aria-label="Mod aplicație">
-                    <a href="/" class="active" aria-current="page">ANALIZEAZĂ</a>
-                    <a href="/builder">CREEAZĂ CV</a>
+                <nav class="mode-switch" aria-label="{{ t('app_mode') }}">
+                    <a href="/" class="active" aria-current="page">{{ t('analyze') }}</a>
+                    <a href="/builder">{{ t('create_cv') }}</a>
                 </nav>
-                <div class="privacy-strip">
-                    <span class="local-pill"><i></i>Analiză finalizată</span>
-                    <a href="/" class="new-analysis">＋ ANALIZĂ NOUĂ</a>
+                <div class="topbar-actions">
+                    <form method="POST" class="language-switch" aria-label="Language">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="next" value="/">
+                        <button formaction="/language/ro" class="{% if lang == 'ro' %}active{% endif %}">RO</button>
+                        <button formaction="/language/en" class="{% if lang == 'en' %}active{% endif %}">EN</button>
+                    </form>
+                    <div class="privacy-strip">
+                        <span class="local-pill"><i></i>{{ t('analysis_complete') }}</span>
+                        <a href="/" class="new-analysis">＋ {{ t('new_analysis') }}</a>
+                    </div>
                 </div>
             </header>
 
             <div class="results-intro">
                 <div>
-                    <span class="eyebrow">RAPORT CV</span>
-                    <h1>Profilul tău, în clar.</h1>
-                    <p>{{ word_count }} cuvinte analizate · Scorurile sunt orientative și explicabile.</p>
+                    <span class="eyebrow">{{ t('cv_report') }}</span>
+                    <h1>{{ t('profile_clear') }}</h1>
+                    <p>{{ t('words_analyzed', count=word_count) }}</p>
                 </div>
-                <div class="result-status"><i></i>PROCESAT LOCAL</div>
+                <div class="result-status"><i></i>{{ t('processed_locally') }}</div>
             </div>
 
             <div class="results-grid">
                 <section class="result-card score-overview">
-                    <div class="card-heading"><span>SCOR ATS</span><small>Structură &amp; lizibilitate</small></div>
+                    <div class="card-heading"><span>{{ t('ats_score') }}</span><small>{{ t('structure_readability') }}</small></div>
                     <div class="score-hero">
                         <div class="score-ring-wrap">
                             <svg class="score-ring" viewBox="0 0 120 120" aria-hidden="true">
@@ -58,28 +66,28 @@
                         </div>
                         <div class="score-summary">
                             <span class="score-label {% if ats.score >= 75 %}good{% elif ats.score >= 50 %}medium{% else %}low{% endif %}">
-                                {% if ats.score >= 75 %}Excelent{% elif ats.score >= 50 %}Bun{% elif ats.score >= 30 %}Mediu{% else %}Necesită atenție{% endif %}
+                                {% if ats.score >= 75 %}{{ t('excellent') }}{% elif ats.score >= 50 %}{{ t('good') }}{% elif ats.score >= 30 %}{{ t('medium') }}{% else %}{{ t('needs_attention') }}{% endif %}
                             </span>
-                            <p>Evaluare bazată pe structură, contact, verbe de acțiune, rezultate măsurabile și lungime.</p>
+                            <p>{{ t('score_explanation') }}</p>
                         </div>
                     </div>
                 </section>
 
                 <section class="result-card match-overview">
-                    <div class="card-heading"><span>POTRIVIRE ROL</span><small>{% if has_job %}Cuvinte-cheie relevante{% else %}Fără descriere de job{% endif %}</small></div>
+                    <div class="card-heading"><span>{{ t('role_match') }}</span><small>{% if has_job %}{{ t('relevant_keywords') }}{% else %}{{ t('without_job') }}{% endif %}</small></div>
                     {% if has_job %}
                         <div class="match-hero"><strong class="match-number {% if match.score >= 75 %}good{% elif match.score >= 50 %}medium{% else %}low{% endif %}">{{ match.score }}<small>%</small></strong><p>{{ match.feedback }}</p></div>
                     {% else %}
-                        <div class="empty-match"><strong>—</strong><p>Adaugă un job la următoarea analiză pentru un scor de potrivire.</p></div>
+                        <div class="empty-match"><strong>—</strong><p>{{ t('add_job_next') }}</p></div>
                     {% endif %}
                 </section>
 
                 <section class="result-card breakdown-card">
-                    <div class="card-heading"><span>STRUCTURA SCORULUI</span><small>Ce a influențat rezultatul</small></div>
+                    <div class="card-heading"><span>{{ t('score_structure') }}</span><small>{{ t('score_influence') }}</small></div>
                     <div class="breakdown">
                         {% for label, (got, total) in ats.breakdown.items() %}
                         <div class="breakdown-row">
-                            <span class="breakdown-label">{{ label }}</span>
+                            <span class="breakdown-label">{{ t(label) }}</span>
                             <div class="progress-bar"><div class="progress-fill" data-percent="{{ (got / total * 100) | round }}"></div></div>
                             <span class="breakdown-pts">{{ got }}/{{ total }}</span>
                         </div>
@@ -88,32 +96,32 @@
                 </section>
 
                 <section class="result-card sections-card">
-                    <div class="card-heading"><span>SECȚIUNI DETECTATE</span><small>{{ ats.found_sections | length }} din {{ (ats.found_sections | length) + (ats.missing_sections | length) }}</small></div>
+                    <div class="card-heading"><span>{{ t('detected_sections') }}</span><small>{{ ats.found_sections | length }} / {{ (ats.found_sections | length) + (ats.missing_sections | length) }}</small></div>
                     <div class="sections-grid">
-                        {% for section in ats.found_sections %}<span class="section-chip found">✓ {{ section }}</span>{% endfor %}
-                        {% for section in ats.missing_sections %}<span class="section-chip missing">× {{ section }}</span>{% endfor %}
+                        {% for section in ats.found_sections %}<span class="section-chip found">✓ {{ t(section) }}</span>{% endfor %}
+                        {% for section in ats.missing_sections %}<span class="section-chip missing">× {{ t(section) }}</span>{% endfor %}
                     </div>
                 </section>
 
                 {% if has_job %}
                 <section class="result-card keywords-card">
-                    <div class="card-heading"><span>HARTA CUVINTELOR-CHEIE</span><small>Potriviri și oportunități</small></div>
+                    <div class="card-heading"><span>{{ t('keyword_map') }}</span><small>{{ t('matches_opportunities') }}</small></div>
                     <div class="keywords-wrap">
-                        {% if match.matched_keywords %}<div class="keyword-group"><h3>Găsite</h3><div class="tags">{% for keyword in match.matched_keywords %}<span class="tag tag-green">{{ keyword }}</span>{% endfor %}</div></div>{% endif %}
-                        {% if match.missing_keywords %}<div class="keyword-group"><h3>De integrat natural</h3><div class="tags">{% for keyword in match.missing_keywords %}<span class="tag tag-red">{{ keyword }}</span>{% endfor %}</div></div>{% endif %}
+                        {% if match.matched_keywords %}<div class="keyword-group"><h3>{{ t('found') }}</h3><div class="tags">{% for keyword in match.matched_keywords %}<span class="tag tag-green">{{ keyword }}</span>{% endfor %}</div></div>{% endif %}
+                        {% if match.missing_keywords %}<div class="keyword-group"><h3>{{ t('integrate_naturally') }}</h3><div class="tags">{% for keyword in match.missing_keywords %}<span class="tag tag-red">{{ keyword }}</span>{% endfor %}</div></div>{% endif %}
                     </div>
                 </section>
                 {% endif %}
 
                 <section class="result-card suggestions-card">
-                    <div class="card-heading"><span>PLAN DE ACȚIUNE</span><small>Recomandări prioritizate</small></div>
+                    <div class="card-heading"><span>{{ t('action_plan') }}</span><small>{{ t('prioritized_recommendations') }}</small></div>
                     <div class="suggestions-list">
                         {% for suggestion in suggestions %}
                         <article class="suggestion priority-{{ suggestion.priority }}">
                             <div class="suggestion-index">{{ '%02d' | format(loop.index) }}</div>
                             <div>
                                 <div class="suggestion-header">
-                                    <span class="priority-badge {{ suggestion.priority }}">{{ 'Urgent' if suggestion.priority == 'high' else ('Recomandat' if suggestion.priority == 'medium' else 'Opțional') }}</span>
+                                    <span class="priority-badge {{ suggestion.priority }}">{{ t('urgent') if suggestion.priority == 'high' else (t('recommended') if suggestion.priority == 'medium' else t('extra')) }}</span>
                                     <span class="suggestion-category">{{ suggestion.category }}</span>
                                 </div>
                                 <p>{{ suggestion.text }}</p>
@@ -125,7 +133,7 @@
 
                 {% if ats.feedback %}
                 <section class="result-card feedback-card">
-                    <div class="card-heading"><span>OBSERVAȚII ATS</span><small>Detalii tehnice</small></div>
+                    <div class="card-heading"><span>{{ t('ats_observations') }}</span><small>{{ t('technical_details') }}</small></div>
                     {% for feedback in ats.feedback %}<div class="feedback-item"><span>!</span>{{ feedback }}</div>{% endfor %}
                 </section>
                 {% endif %}

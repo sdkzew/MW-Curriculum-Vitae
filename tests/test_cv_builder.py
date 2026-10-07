@@ -1,9 +1,18 @@
 import unittest
+from io import BytesIO
+from zipfile import ZipFile
 
 from docx import Document
+from PIL import Image
 from werkzeug.datastructures import MultiDict
+from werkzeug.datastructures import FileStorage
 
-from analyzer.cv_builder import CVBuildError, build_cv_document, profile_from_form
+from analyzer.cv_builder import (
+    CVBuildError,
+    build_cv_document,
+    prepare_profile_photo,
+    profile_from_form,
+)
 
 
 class CVBuilderTests(unittest.TestCase):
@@ -64,6 +73,27 @@ class CVBuilderTests(unittest.TestCase):
     def test_unknown_template_is_rejected(self):
         with self.assertRaises(CVBuildError):
             profile_from_form({"template": "official", "full_name": "Alex"})
+
+    def test_photo_is_safely_processed_and_embedded(self):
+        source = BytesIO()
+        Image.new("RGB", (900, 600), (92, 64, 170)).save(source, format="JPEG")
+        source.seek(0)
+        upload = FileStorage(stream=source, filename="portrait.jpg", content_type="image/jpeg")
+        photo = prepare_profile_photo(upload, "en")
+        profile, template = profile_from_form(self.sample_form("modern"), "en")
+
+        output = build_cv_document(profile, template, photo, "en")
+        payload = output.getvalue()
+        with ZipFile(BytesIO(payload)) as archive:
+            self.assertTrue(any(name.startswith("word/media/") for name in archive.namelist()))
+        document = Document(BytesIO(payload))
+        text = self.document_text(document)
+        self.assertIn("WORK EXPERIENCE", text)
+
+    def test_invalid_photo_is_rejected(self):
+        upload = FileStorage(stream=BytesIO(b"not an image"), filename="portrait.png")
+        with self.assertRaisesRegex(CVBuildError, "valid JPG or PNG"):
+            prepare_profile_photo(upload, "en")
 
 
 if __name__ == "__main__":

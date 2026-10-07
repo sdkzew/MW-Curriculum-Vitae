@@ -1,155 +1,172 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#08080c">
-    <title>Creează CV — MORPH WRLD</title>
-    <link rel="icon" href="{{ url_for('static', filename='mw-mark.svg') }}">
+    <title>{{ t('create_cv') }} — MORPH WRLD</title>
+    <link rel="icon" href="{{ url_for('static', filename='mw-icon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="builder-page">
     <div class="app-shell">
-        <aside class="step-rail" aria-label="Pași creare CV">
+        <aside class="step-rail" aria-label="{{ t('builder_steps') }}">
             <a href="/" class="rail-logo" aria-label="MORPH WRLD Curriculum Vitae">
                 <img src="{{ url_for('static', filename='mw-mark.svg') }}" alt="MORPH WRLD">
             </a>
             <div class="rail-line" aria-hidden="true"></div>
             <ol class="steps">
-                <li class="step active"><span class="step-dot"><span></span></span><span class="step-number">01</span><span class="step-name">PROFIL</span></li>
-                <li class="step"><span class="step-dot"></span><span class="step-number">02</span><span class="step-name">CARIERĂ</span></li>
-                <li class="step"><span class="step-dot"></span><span class="step-number">03</span><span class="step-name">EXPORT</span></li>
+                <li class="step active"><span class="step-dot"><span></span></span><span class="step-number">01</span><span class="step-name">{{ t('profile') }}</span></li>
+                <li class="step"><span class="step-dot"></span><span class="step-number">02</span><span class="step-name">{{ t('career') }}</span></li>
+                <li class="step"><span class="step-dot"></span><span class="step-number">03</span><span class="step-name">{{ t('export') }}</span></li>
             </ol>
-            <span class="rail-version">v1.2</span>
+            <span class="rail-version">v1.3</span>
         </aside>
 
         <main class="workspace builder-workspace">
             <header class="topbar">
                 <div class="brand-lockup"><strong>MORPH WRLD</strong><span></span><small>CURRICULUM VITAE</small></div>
-                <nav class="mode-switch" aria-label="Mod aplicație">
-                    <a href="/">ANALIZEAZĂ</a>
-                    <a href="/builder" class="active" aria-current="page">CREEAZĂ CV</a>
+                <nav class="mode-switch" aria-label="{{ t('app_mode') }}">
+                    <a href="/">{{ t('analyze') }}</a>
+                    <a href="/builder" class="active" aria-current="page">{{ t('create_cv') }}</a>
                 </nav>
-                <div class="privacy-strip"><span class="local-pill"><i></i>Procesare locală</span></div>
+                <div class="topbar-actions">
+                    <form method="POST" class="language-switch" aria-label="Language">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="next" value="/builder">
+                        <button formaction="/language/ro" class="{% if lang == 'ro' %}active{% endif %}">RO</button>
+                        <button formaction="/language/en" class="{% if lang == 'en' %}active{% endif %}">EN</button>
+                    </form>
+                    <div class="privacy-strip"><span class="local-pill"><i></i>{{ t('local_processing') }}</span></div>
+                </div>
             </header>
 
             {% with messages = get_flashed_messages() %}
                 {% if messages %}<div class="alert" role="alert">{% for msg in messages %}<p>{{ msg }}</p>{% endfor %}</div>{% endif %}
             {% endwith %}
 
-            <form action="/builder/export" method="POST" class="builder-layout" id="cv-builder">
+            <form action="/builder/export" method="POST" enctype="multipart/form-data" class="builder-layout" id="cv-builder"
+                  data-experience-label="{{ t('experience') }}" data-education-label="{{ t('education') }}"
+                  data-name-fallback="{{ t('your_name') }}" data-title-fallback="{{ t('title_placeholder') }}"
+                  data-summary-fallback="{{ t('preview_summary') }}" data-email-fallback="email"
+                  data-location-fallback="{{ t('location') | lower }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <section class="builder-form">
                     <div class="page-intro builder-intro">
-                        <span class="eyebrow">CV BUILDER · EXPORT DOCX</span>
-                        <h1>Construiește un CV care te reprezintă.</h1>
-                        <p>Completezi datele local, alegi stilul, apoi descarci documentul editabil.</p>
+                        <span class="eyebrow">{{ t('builder_eyebrow') }}</span>
+                        <h1>{{ t('build_title') }}</h1>
+                        <p>{{ t('build_intro') }}</p>
                     </div>
 
                     <section class="form-card">
-                        <div class="form-card-heading"><span>01</span><div><h2>Identitate profesională</h2><p>Informațiile esențiale din antetul CV-ului.</p></div></div>
+                        <div class="form-card-heading"><span>01</span><div><h2>{{ t('professional_identity') }}</h2><p>{{ t('identity_help') }}</p></div></div>
                         <div class="form-grid">
-                            <label class="field field-wide"><span>Nume complet *</span><input id="full_name" name="full_name" maxlength="120" placeholder="Alex Morgan" required></label>
-                            <label class="field field-wide"><span>Titlu profesional</span><input id="headline" name="headline" maxlength="180" placeholder="Product Designer · UI Systems"></label>
+                            <div class="photo-field field-wide">
+                                <div class="photo-avatar" id="photo-avatar"><span id="photo-initials">MW</span><img id="photo-preview" alt="" hidden></div>
+                                <div class="photo-copy"><strong>{{ t('profile_photo') }}</strong><p>{{ t('photo_help') }}</p><div><label for="profile_photo" class="photo-button">{{ t('choose_photo') }}</label><button type="button" class="photo-remove" id="remove-photo" hidden>{{ t('remove_photo') }}</button></div></div>
+                                <input type="file" id="profile_photo" name="profile_photo" accept=".jpg,.jpeg,.png,image/jpeg,image/png" hidden>
+                            </div>
+                            <label class="field field-wide"><span>{{ t('full_name') }}</span><input id="full_name" name="full_name" maxlength="120" placeholder="Alex Morgan" required></label>
+                            <label class="field field-wide"><span>{{ t('professional_title') }}</span><input id="headline" name="headline" maxlength="180" placeholder="Product Designer · UI Systems"></label>
                             <label class="field"><span>Email</span><input id="email" name="email" type="email" maxlength="254" placeholder="alex@email.com"></label>
-                            <label class="field"><span>Telefon</span><input name="phone" maxlength="80" placeholder="+40 7xx xxx xxx"></label>
-                            <label class="field"><span>Locație</span><input id="location" name="location" maxlength="160" placeholder="București, România"></label>
+                            <label class="field"><span>{{ t('phone') }}</span><input name="phone" maxlength="80" placeholder="+40 7xx xxx xxx"></label>
+                            <label class="field"><span>{{ t('location') }}</span><input id="location" name="location" maxlength="160" placeholder="{{ 'Bucharest, Romania' if lang == 'en' else 'București, România' }}"></label>
                             <label class="field"><span>LinkedIn</span><input name="linkedin" maxlength="300" placeholder="linkedin.com/in/alex"></label>
-                            <label class="field field-wide"><span>Website / Portofoliu</span><input name="website" maxlength="300" placeholder="alexmorgan.design"></label>
-                            <label class="field field-wide"><span>Profil profesional</span><textarea id="summary" name="summary" maxlength="4000" rows="4" placeholder="Rezumat scurt, clar și orientat spre impact..."></textarea></label>
+                            <label class="field field-wide"><span>{{ t('website_portfolio') }}</span><input name="website" maxlength="300" placeholder="alexmorgan.design"></label>
+                            <label class="field field-wide"><span>{{ t('professional_summary') }}</span><textarea id="summary" name="summary" maxlength="4000" rows="4" placeholder="{{ t('summary_placeholder') }}"></textarea></label>
                         </div>
                     </section>
 
                     <section class="form-card">
-                        <div class="form-card-heading"><span>02</span><div><h2>Experiență profesională</h2><p>Poți adăuga până la 8 roluri. Scrie realizările pe rânduri separate.</p></div></div>
+                        <div class="form-card-heading"><span>02</span><div><h2>{{ t('work_experience') }}</h2><p>{{ t('experience_help') }}</p></div></div>
                         <div class="repeatable-list" id="experience-list">
                             <article class="repeatable-item">
-                                <div class="repeatable-head"><strong>EXPERIENȚĂ 01</strong><button type="button" class="remove-row" aria-label="Șterge experiența">ȘTERGE</button></div>
+                                <div class="repeatable-head"><strong>{{ t('experience') }} 01</strong><button type="button" class="remove-row" aria-label="{{ t('delete') }}">{{ t('delete') }}</button></div>
                                 <div class="form-grid">
-                                    <label class="field"><span>Rol</span><input name="experience_role" maxlength="180" placeholder="Senior Product Designer"></label>
-                                    <label class="field"><span>Organizație</span><input name="experience_organization" maxlength="180" placeholder="Company Studio"></label>
-                                    <label class="field"><span>Perioadă</span><input name="experience_dates" maxlength="100" placeholder="2023 — Prezent"></label>
-                                    <label class="field"><span>Locație</span><input name="experience_location" maxlength="120" placeholder="Remote"></label>
-                                    <label class="field field-wide"><span>Realizări / responsabilități</span><textarea name="experience_details" maxlength="4000" rows="4" placeholder="Am crescut conversia cu 18%...&#10;Am coordonat un sistem de design..."></textarea></label>
+                                    <label class="field"><span>{{ t('role') }}</span><input name="experience_role" maxlength="180" placeholder="Senior Product Designer"></label>
+                                    <label class="field"><span>{{ t('organization') }}</span><input name="experience_organization" maxlength="180" placeholder="Company Studio"></label>
+                                    <label class="field"><span>{{ t('period') }}</span><input name="experience_dates" maxlength="100" placeholder="2023 — {{ 'Present' if lang == 'en' else 'Prezent' }}"></label>
+                                    <label class="field"><span>{{ t('location') }}</span><input name="experience_location" maxlength="120" placeholder="Remote"></label>
+                                    <label class="field field-wide"><span>{{ t('achievements') }}</span><textarea name="experience_details" maxlength="4000" rows="4" placeholder="{{ t('achievements_placeholder') }}"></textarea></label>
                                 </div>
                             </article>
                         </div>
-                        <button type="button" class="add-row" id="add-experience">＋ ADAUGĂ EXPERIENȚĂ</button>
+                        <button type="button" class="add-row" id="add-experience">{{ t('add_experience') }}</button>
                     </section>
 
                     <section class="form-card">
-                        <div class="form-card-heading"><span>03</span><div><h2>Educație și formare</h2><p>Studii, cursuri relevante și calificări profesionale.</p></div></div>
+                        <div class="form-card-heading"><span>03</span><div><h2>{{ t('education_training') }}</h2><p>{{ t('education_help') }}</p></div></div>
                         <div class="repeatable-list" id="education-list">
                             <article class="repeatable-item">
-                                <div class="repeatable-head"><strong>EDUCAȚIE 01</strong><button type="button" class="remove-row" aria-label="Șterge educația">ȘTERGE</button></div>
+                                <div class="repeatable-head"><strong>{{ t('education') }} 01</strong><button type="button" class="remove-row" aria-label="{{ t('delete') }}">{{ t('delete') }}</button></div>
                                 <div class="form-grid">
-                                    <label class="field"><span>Calificare</span><input name="education_qualification" maxlength="180" placeholder="Licență · Design"></label>
-                                    <label class="field"><span>Instituție</span><input name="education_institution" maxlength="180" placeholder="Universitatea..."></label>
-                                    <label class="field"><span>Perioadă</span><input name="education_dates" maxlength="100" placeholder="2019 — 2022"></label>
-                                    <label class="field"><span>Locație</span><input name="education_location" maxlength="120" placeholder="București"></label>
-                                    <label class="field field-wide"><span>Detalii</span><textarea name="education_details" maxlength="3000" rows="3" placeholder="Specializare, rezultate, activități relevante..."></textarea></label>
+                                    <label class="field"><span>{{ t('qualification') }}</span><input name="education_qualification" maxlength="180" placeholder="{{ 'BA · Design' if lang == 'en' else 'Licență · Design' }}"></label>
+                                    <label class="field"><span>{{ t('institution') }}</span><input name="education_institution" maxlength="180" placeholder="{{ 'University...' if lang == 'en' else 'Universitatea...' }}"></label>
+                                    <label class="field"><span>{{ t('period') }}</span><input name="education_dates" maxlength="100" placeholder="2019 — 2022"></label>
+                                    <label class="field"><span>{{ t('location') }}</span><input name="education_location" maxlength="120" placeholder="{{ 'Bucharest' if lang == 'en' else 'București' }}"></label>
+                                    <label class="field field-wide"><span>{{ t('details') }}</span><textarea name="education_details" maxlength="3000" rows="3" placeholder="{{ 'Specialization, results, and relevant activities...' if lang == 'en' else 'Specializare, rezultate, activități relevante...' }}"></textarea></label>
                                 </div>
                             </article>
                         </div>
-                        <button type="button" class="add-row" id="add-education">＋ ADAUGĂ EDUCAȚIE</button>
+                        <button type="button" class="add-row" id="add-education">{{ t('add_education') }}</button>
                     </section>
 
                     <section class="form-card">
-                        <div class="form-card-heading"><span>04</span><div><h2>Competențe și secțiuni extra</h2><p>Structură compatibilă cu informațiile recomandate de Europass.</p></div></div>
+                        <div class="form-card-heading"><span>04</span><div><h2>{{ t('skills_extra') }}</h2><p>{{ t('skills_help') }}</p></div></div>
                         <div class="form-grid">
-                            <label class="field field-wide"><span>Competențe</span><textarea name="skills" maxlength="2000" rows="3" placeholder="Leadership · Research · Product strategy"></textarea></label>
-                            <label class="field field-wide"><span>Competențe digitale</span><textarea name="digital_skills" maxlength="2000" rows="3" placeholder="Figma · Jira · Notion · HTML/CSS"></textarea></label>
-                            <label class="field"><span>Limbi</span><textarea name="languages" maxlength="2000" rows="3" placeholder="Română — nativ&#10;Engleză — C1"></textarea></label>
-                            <label class="field"><span>Certificări</span><textarea name="certifications" maxlength="2000" rows="3" placeholder="Certificare · Emitent · An"></textarea></label>
-                            <label class="field"><span>Proiecte</span><textarea name="projects" maxlength="3000" rows="4" placeholder="Proiect, rol și rezultat..."></textarea></label>
-                            <label class="field"><span>Voluntariat / realizări</span><textarea name="additional" maxlength="3000" rows="4" placeholder="Activități, premii sau publicații..."></textarea></label>
+                            <label class="field field-wide"><span>{{ t('skills') }}</span><textarea name="skills" maxlength="2000" rows="3" placeholder="Leadership · Research · Product strategy"></textarea></label>
+                            <label class="field field-wide"><span>{{ t('digital_skills') }}</span><textarea name="digital_skills" maxlength="2000" rows="3" placeholder="Figma · Jira · Notion · HTML/CSS"></textarea></label>
+                            <label class="field"><span>{{ t('languages') }}</span><textarea name="languages" maxlength="2000" rows="3" placeholder="{{ 'Romanian — native' if lang == 'en' else 'Română — nativ' }}&#10;{{ 'English — C1' if lang == 'en' else 'Engleză — C1' }}"></textarea></label>
+                            <label class="field"><span>{{ t('certifications') }}</span><textarea name="certifications" maxlength="2000" rows="3" placeholder="{{ 'Certification · Issuer · Year' if lang == 'en' else 'Certificare · Emitent · An' }}"></textarea></label>
+                            <label class="field"><span>{{ t('projects') }}</span><textarea name="projects" maxlength="3000" rows="4" placeholder="{{ 'Project, role, and outcome...' if lang == 'en' else 'Proiect, rol și rezultat...' }}"></textarea></label>
+                            <label class="field"><span>{{ t('volunteering_achievements') }}</span><textarea name="additional" maxlength="3000" rows="4" placeholder="{{ 'Activities, awards, or publications...' if lang == 'en' else 'Activități, premii sau publicații...' }}"></textarea></label>
                         </div>
                     </section>
                 </section>
 
                 <aside class="builder-side">
                     <section class="template-panel">
-                        <div class="panel-title"><span>ALEGE FORMATUL</span><span class="info-icon">i</span></div>
+                        <div class="panel-title"><span>{{ t('choose_format') }}</span><span class="info-icon">i</span></div>
                         <div class="template-picker">
                             <label class="template-option selected">
                                 <input type="radio" name="template" value="europass" checked>
                                 <span class="template-swatch europass-swatch"></span>
-                                <span><strong>Europass-inspired</strong><small>Familiar · European</small></span>
+                                <span><strong>Europass-inspired</strong><small>{{ t('familiar_european') }}</small></span>
                             </label>
                             <label class="template-option">
                                 <input type="radio" name="template" value="ats">
                                 <span class="template-swatch ats-swatch"></span>
-                                <span><strong>ATS Classic</strong><small>Direct · Scan-friendly</small></span>
+                                <span><strong>ATS Classic</strong><small>{{ t('direct_scan') }}</small></span>
                             </label>
                             <label class="template-option">
                                 <input type="radio" name="template" value="modern">
                                 <span class="template-swatch modern-swatch"></span>
-                                <span><strong>Modern Minimal</strong><small>Distinct · Creative</small></span>
+                                <span><strong>Modern Minimal</strong><small>{{ t('distinct_creative') }}</small></span>
                             </label>
                         </div>
                     </section>
 
                     <section class="cv-preview-card europass" id="cv-preview">
-                        <div class="preview-paper-label"><span id="preview-template">EUROPASS-INSPIRED</span><small>LIVE PREVIEW</small></div>
+                        <div class="preview-paper-label"><span id="preview-template">EUROPASS-INSPIRED</span><small>{{ t('live_preview') }}</small></div>
                         <div class="preview-person">
-                            <span class="preview-avatar">MW</span>
-                            <div><strong id="preview-name">NUMELE TĂU</strong><p id="preview-headline">Titlul profesional</p></div>
+                            <span class="preview-avatar"><span id="preview-avatar-text">MW</span><img id="preview-avatar-image" alt="" hidden></span>
+                            <div><strong id="preview-name">{{ t('your_name') }}</strong><p id="preview-headline">{{ t('title_placeholder') }}</p></div>
                         </div>
-                        <p class="preview-contact" id="preview-contact">email · locație</p>
-                        <div class="preview-section"><span>PROFIL</span><p id="preview-summary">Un rezumat profesional concis va apărea aici.</p></div>
-                        <div class="preview-section"><span>EXPERIENȚĂ</span><i></i><i></i><i class="short"></i></div>
-                        <div class="preview-section"><span>EDUCAȚIE &amp; COMPETENȚE</span><i></i><i class="short"></i></div>
+                        <p class="preview-contact" id="preview-contact">{{ t('email_location') }}</p>
+                        <div class="preview-section"><span>{{ t('profile') }}</span><p id="preview-summary">{{ t('preview_summary') }}</p></div>
+                        <div class="preview-section"><span>{{ t('experience') }}</span><i></i><i></i><i class="short"></i></div>
+                        <div class="preview-section"><span>{{ t('education_skills') }}</span><i></i><i class="short"></i></div>
                     </section>
 
                     <div class="official-note">
-                        <strong>DESPRE FORMAT</strong>
-                        <p>Structura urmărește secțiunile Europass, dar documentul este creat independent și nu reprezintă un formular oficial al Uniunii Europene.</p>
-                        <a href="https://europass.europa.eu/en/create-europass-cv" target="_blank" rel="noreferrer">Deschide Europass oficial ↗</a>
+                        <strong>{{ t('about_format') }}</strong>
+                        <p>{{ t('format_disclaimer') }}</p>
+                        <a href="https://europass.europa.eu/en/create-europass-cv" target="_blank" rel="noreferrer">{{ t('open_europass') }}</a>
                     </div>
 
-                    <button type="submit" class="primary-action export-action"><span>↓</span> DESCARCĂ DOCX <b>→</b></button>
-                    <p class="local-footnote"><i></i>Datele rămân pe dispozitiv. Nu sunt trimise unui serviciu cloud.</p>
+                    <button type="submit" class="primary-action export-action"><span>↓</span> {{ t('download_docx') }} <b>→</b></button>
+                    <p class="local-footnote"><i></i>{{ t('local_data_note') }}</p>
                 </aside>
             </form>
         </main>
@@ -157,25 +174,25 @@
 
     <template id="experience-template">
         <article class="repeatable-item">
-            <div class="repeatable-head"><strong>EXPERIENȚĂ</strong><button type="button" class="remove-row" aria-label="Șterge experiența">ȘTERGE</button></div>
+            <div class="repeatable-head"><strong>{{ t('experience') }}</strong><button type="button" class="remove-row" aria-label="{{ t('delete') }}">{{ t('delete') }}</button></div>
             <div class="form-grid">
-                <label class="field"><span>Rol</span><input name="experience_role" maxlength="180" placeholder="Senior Product Designer"></label>
-                <label class="field"><span>Organizație</span><input name="experience_organization" maxlength="180" placeholder="Company Studio"></label>
-                <label class="field"><span>Perioadă</span><input name="experience_dates" maxlength="100" placeholder="2023 — Prezent"></label>
-                <label class="field"><span>Locație</span><input name="experience_location" maxlength="120" placeholder="Remote"></label>
-                <label class="field field-wide"><span>Realizări / responsabilități</span><textarea name="experience_details" maxlength="4000" rows="4" placeholder="Câte o realizare pe fiecare rând..."></textarea></label>
+                <label class="field"><span>{{ t('role') }}</span><input name="experience_role" maxlength="180" placeholder="Senior Product Designer"></label>
+                <label class="field"><span>{{ t('organization') }}</span><input name="experience_organization" maxlength="180" placeholder="Company Studio"></label>
+                <label class="field"><span>{{ t('period') }}</span><input name="experience_dates" maxlength="100" placeholder="2023 — {{ 'Present' if lang == 'en' else 'Prezent' }}"></label>
+                <label class="field"><span>{{ t('location') }}</span><input name="experience_location" maxlength="120" placeholder="Remote"></label>
+                <label class="field field-wide"><span>{{ t('achievements') }}</span><textarea name="experience_details" maxlength="4000" rows="4" placeholder="{{ 'One achievement per line...' if lang == 'en' else 'Câte o realizare pe fiecare rând...' }}"></textarea></label>
             </div>
         </article>
     </template>
     <template id="education-template">
         <article class="repeatable-item">
-            <div class="repeatable-head"><strong>EDUCAȚIE</strong><button type="button" class="remove-row" aria-label="Șterge educația">ȘTERGE</button></div>
+            <div class="repeatable-head"><strong>{{ t('education') }}</strong><button type="button" class="remove-row" aria-label="{{ t('delete') }}">{{ t('delete') }}</button></div>
             <div class="form-grid">
-                <label class="field"><span>Calificare</span><input name="education_qualification" maxlength="180" placeholder="Licență · Design"></label>
-                <label class="field"><span>Instituție</span><input name="education_institution" maxlength="180" placeholder="Universitatea..."></label>
-                <label class="field"><span>Perioadă</span><input name="education_dates" maxlength="100" placeholder="2019 — 2022"></label>
-                <label class="field"><span>Locație</span><input name="education_location" maxlength="120" placeholder="București"></label>
-                <label class="field field-wide"><span>Detalii</span><textarea name="education_details" maxlength="3000" rows="3" placeholder="Specializare și rezultate relevante..."></textarea></label>
+                <label class="field"><span>{{ t('qualification') }}</span><input name="education_qualification" maxlength="180" placeholder="{{ 'BA · Design' if lang == 'en' else 'Licență · Design' }}"></label>
+                <label class="field"><span>{{ t('institution') }}</span><input name="education_institution" maxlength="180" placeholder="{{ 'University...' if lang == 'en' else 'Universitatea...' }}"></label>
+                <label class="field"><span>{{ t('period') }}</span><input name="education_dates" maxlength="100" placeholder="2019 — 2022"></label>
+                <label class="field"><span>{{ t('location') }}</span><input name="education_location" maxlength="120" placeholder="{{ 'Bucharest' if lang == 'en' else 'București' }}"></label>
+                <label class="field field-wide"><span>{{ t('details') }}</span><textarea name="education_details" maxlength="3000" rows="3" placeholder="{{ 'Specialization and relevant outcomes...' if lang == 'en' else 'Specializare și rezultate relevante...' }}"></textarea></label>
             </div>
         </article>
     </template>

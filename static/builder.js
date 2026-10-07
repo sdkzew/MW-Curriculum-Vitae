@@ -1,5 +1,11 @@
 const form = document.querySelector("#cv-builder");
 const preview = document.querySelector("#cv-preview");
+const profilePhoto = document.querySelector("#profile_photo");
+const photoPreview = document.querySelector("#photo-preview");
+const photoInitials = document.querySelector("#photo-initials");
+const previewAvatarImage = document.querySelector("#preview-avatar-image");
+const previewAvatarText = document.querySelector("#preview-avatar-text");
+const removePhoto = document.querySelector("#remove-photo");
 
 function textOrFallback(id, fallback) {
     const field = document.querySelector(`#${id}`);
@@ -7,14 +13,14 @@ function textOrFallback(id, fallback) {
 }
 
 function updatePreview() {
-    document.querySelector("#preview-name").textContent = textOrFallback("full_name", "NUMELE TĂU");
-    document.querySelector("#preview-headline").textContent = textOrFallback("headline", "Titlul profesional");
+    document.querySelector("#preview-name").textContent = textOrFallback("full_name", form.dataset.nameFallback);
+    document.querySelector("#preview-headline").textContent = textOrFallback("headline", form.dataset.titleFallback);
     document.querySelector("#preview-summary").textContent = textOrFallback(
         "summary",
-        "Un rezumat profesional concis va apărea aici."
+        form.dataset.summaryFallback
     );
-    const email = textOrFallback("email", "email");
-    const location = textOrFallback("location", "locație");
+    const email = textOrFallback("email", form.dataset.emailFallback);
+    const location = textOrFallback("location", form.dataset.locationFallback);
     document.querySelector("#preview-contact").textContent = `${email} · ${location}`;
 }
 
@@ -33,18 +39,18 @@ function addRow(listId, templateId, label) {
 }
 
 document.querySelector("#add-experience").addEventListener("click", () => {
-    addRow("experience-list", "experience-template", "EXPERIENȚĂ");
+    addRow("experience-list", "experience-template", form.dataset.experienceLabel);
 });
 
 document.querySelector("#add-education").addEventListener("click", () => {
-    addRow("education-list", "education-template", "EDUCAȚIE");
+    addRow("education-list", "education-template", form.dataset.educationLabel);
 });
 
 form.addEventListener("click", (event) => {
     const button = event.target.closest(".remove-row");
     if (!button) return;
     const list = button.closest(".repeatable-list");
-    const label = list.id === "experience-list" ? "EXPERIENȚĂ" : "EDUCAȚIE";
+    const label = list.id === "experience-list" ? form.dataset.experienceLabel : form.dataset.educationLabel;
     button.closest(".repeatable-item").remove();
     renumberRows(list, label);
 });
@@ -65,5 +71,37 @@ document.querySelectorAll('input[name="template"]').forEach((radio) => {
         document.querySelector("#preview-template").textContent = names[radio.value];
     });
 });
+
+function clearPhoto() {
+    profilePhoto.value = "";
+    photoPreview.src = "";
+    previewAvatarImage.src = "";
+    photoPreview.hidden = true;
+    previewAvatarImage.hidden = true;
+    photoInitials.hidden = false;
+    previewAvatarText.hidden = false;
+    removePhoto.hidden = true;
+}
+
+profilePhoto.addEventListener("change", () => {
+    const file = profilePhoto.files[0];
+    if (!file) {
+        clearPhoto();
+        return;
+    }
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+        photoPreview.src = reader.result;
+        previewAvatarImage.src = reader.result;
+        photoPreview.hidden = false;
+        previewAvatarImage.hidden = false;
+        photoInitials.hidden = true;
+        previewAvatarText.hidden = true;
+        removePhoto.hidden = false;
+    });
+    reader.readAsDataURL(file);
+});
+
+removePhoto.addEventListener("click", clearPhoto);
 
 updatePreview();

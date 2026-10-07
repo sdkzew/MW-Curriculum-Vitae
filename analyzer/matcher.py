@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List
 
 
 @dataclass
@@ -12,13 +12,18 @@ class MatchResult:
 
 
 def _tokenize(text: str) -> set:
-    words = re.findall(r'\b[a-zA-ZăîâșțĂÎÂȘȚ]{3,}\b', text.lower())
+    normalized = text.lower()
+    technology_tokens = {
+        match.group(0).replace(" ", "")
+        for match in re.finditer(r"(?<!\w)(?:c\+\+|c#|\.net|node(?:\.js|\s+js))(?!\w)", normalized)
+    }
+    words = re.findall(r'\b[a-zA-ZăîâșțĂÎÂȘȚ][a-zA-Z0-9ăîâșțĂÎÂȘȚ-]{2,}\b', normalized)
     stopwords = {
         "and", "the", "for", "with", "that", "this", "are", "you", "have",
         "will", "from", "our", "their", "your", "not", "all", "can", "but",
         "sau", "si", "cu", "de", "la", "in", "pe", "un", "cel", "ale",
     }
-    return {w for w in words if w not in stopwords}
+    return {word for word in words if word not in stopwords} | technology_tokens
 
 
 def match_job(cv_text: str, job_text: str) -> MatchResult:

@@ -17,7 +17,7 @@ def generate_suggestions(cv_text: str, ats_score: int, match_score: int, missing
         suggestions.append({
             "priority": "high",
             "category": "Contact",
-            "text": "Adauga profilul tau LinkedIn. Recrutatorii verifica profilul LinkedIn in 87% din cazuri.",
+            "text": "Adauga profilul tau LinkedIn pentru ca recrutorii sa poata verifica mai usor experienta profesionala.",
         })
 
     if "github" not in lower and "portfolio" not in lower:

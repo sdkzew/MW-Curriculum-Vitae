@@ -22,6 +22,7 @@
         {% endwith %}
 
         <form action="/analyze" method="POST" enctype="multipart/form-data" class="upload-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="upload-section">
                 <label for="cv_file" class="upload-label">
                     <div class="upload-box" id="upload-box">
@@ -57,30 +58,6 @@
         </footer>
     </div>
 
-    <script>
-        const input = document.getElementById('cv_file');
-        const box = document.getElementById('upload-box');
-        const text = document.getElementById('upload-text');
-
-        input.addEventListener('change', () => {
-            if (input.files.length > 0) {
-                text.innerHTML = `<strong>${input.files[0].name}</strong>`;
-                box.classList.add('has-file');
-            }
-        });
-
-        box.addEventListener('dragover', (e) => { e.preventDefault(); box.classList.add('drag-over'); });
-        box.addEventListener('dragleave', () => box.classList.remove('drag-over'));
-        box.addEventListener('drop', (e) => {
-            e.preventDefault();
-            box.classList.remove('drag-over');
-            const dt = e.dataTransfer;
-            if (dt.files.length > 0) {
-                input.files = dt.files;
-                text.innerHTML = `<strong>${dt.files[0].name}</strong>`;
-                box.classList.add('has-file');
-            }
-        });
-    </script>
+    <script src="{{ url_for('static', filename='index.js') }}" defer></script>
 </body>
 </html>

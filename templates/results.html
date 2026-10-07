@@ -38,7 +38,7 @@
                 <div class="breakdown-row">
                     <span class="breakdown-label">{{ label }}</span>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ (got / total * 100) | round }}%"></div>
+                        <div class="progress-fill" data-percent="{{ (got / total * 100) | round }}"></div>
                     </div>
                     <span class="breakdown-pts">{{ got }}/{{ total }}</span>
                 </div>
@@ -127,21 +127,6 @@
         </footer>
     </div>
 
-    <script>
-        // Animate score ring on load
-        document.querySelectorAll('.ring-fill').forEach(el => {
-            const target = el.getAttribute('stroke-dasharray');
-            el.style.strokeDasharray = '0 314';
-            setTimeout(() => {
-                el.style.transition = 'stroke-dasharray 1s ease';
-                el.style.strokeDasharray = target;
-            }, 100);
-        });
-        // Color ring based on score
-        document.querySelectorAll('.ring-fill').forEach(el => {
-            const score = parseInt(el.dataset.score);
-            el.style.stroke = score >= 75 ? '#22c55e' : score >= 50 ? '#f59e0b' : '#ef4444';
-        });
-    </script>
+    <script src="{{ url_for('static', filename='results.js') }}" defer></script>
 </body>
 </html>

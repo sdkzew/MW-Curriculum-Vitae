@@ -26,6 +26,10 @@ EMAIL_RE = re.compile(r'[\w.\-]+@[\w.\-]+\.[a-z]{2,}', re.IGNORECASE)
 PHONE_RE = re.compile(r'(\+?\d[\d\s\-\(\)]{7,15}\d)')
 
 
+def _contains_term(text: str, term: str) -> bool:
+    return re.search(rf"(?<!\w){re.escape(term)}(?!\w)", text, re.IGNORECASE) is not None
+
+
 @dataclass
 class ATSResult:
     score: int = 0
@@ -55,15 +59,13 @@ def score_cv(text: str) -> ATSResult:
 
     # 2. Sections present (30pts)
     section_score = 0
-    pts_per_section = 30 // len(SECTION_KEYWORDS)
     for section, keywords in SECTION_KEYWORDS.items():
-        found = any(kw in lower for kw in keywords)
+        found = any(_contains_term(lower, keyword) for keyword in keywords)
         if found:
-            section_score += pts_per_section
             result.found_sections.append(section)
         else:
             result.missing_sections.append(section)
-    section_score = min(section_score, 30)
+    section_score = round(len(result.found_sections) / len(SECTION_KEYWORDS) * 30)
     result.breakdown["Sections"] = (section_score, 30)
     result.score += section_score
     if result.missing_sections:
@@ -73,7 +75,7 @@ def score_cv(text: str) -> ATSResult:
         )
 
     # 3. Power words (15pts)
-    found_power = [w for w in POWER_WORDS if w in lower]
+    found_power = [word for word in POWER_WORDS if _contains_term(lower, word)]
     power_score = min(len(found_power) * 2, 15)
     result.breakdown["Action Verbs"] = (power_score, 15)
     result.score += power_score
